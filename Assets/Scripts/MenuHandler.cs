@@ -20,15 +20,4 @@ public class MenuHandler : MonoBehaviour
         
     }
     
-    public void SpawnCube()
-    {
-        var dataPoint = Instantiate(DataPointPrefab).GetComponent<DataPoint>();
-        dataPoint.Label = text.text;
-        dataPoint.menu = this;
-    } 
-
-    public void DisplayLabel(DataPoint dataPoint)
-    {
-        DisplayText.text = dataPoint.Label;
-    }
 }

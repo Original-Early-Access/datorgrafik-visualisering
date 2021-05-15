@@ -30,6 +30,15 @@ public class DataPointHandler : MonoBehaviour
 
         startTime = Time.time;
 
+        if (dp.LabelID == 0)
+            GetComponent<MeshRenderer>().material.color = Color.green;
+
+        else if(dp.LabelID == 1)
+            GetComponent<MeshRenderer>().material.color = Color.blue;
+
+        else
+            GetComponent<MeshRenderer>().material.color = Color.red;
+
         // Calculate the journey length.
         journeyLength = Vector3.Distance(startMarker, endMarker);
     }
