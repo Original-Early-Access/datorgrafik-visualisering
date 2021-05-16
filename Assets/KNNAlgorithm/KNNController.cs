@@ -28,7 +28,6 @@ namespace Assets.KNNAlgorithm
         public List<int> SelectedFeatures { get; set; } = new List<int>();
         public void StartPrediction()
         {
-            kNN kNN = new kNN();
 
             PrepareData();
 
@@ -45,14 +44,9 @@ namespace Assets.KNNAlgorithm
             }
 
             DataPointSpawner.Instance.Destroy = true;
-            int k = 1;
             foreach(var datapoint in dataPoints)
             {
-                
-                int predict = kNN.Classify(new double[3] { datapoint.X, datapoint.Y, datapoint.Z }, TrainingData, Labels.Count(), k, SelectedFeatures.Count());
-                datapoint.Label = Labels[predict];
-                datapoint.LabelID = predict;
-                DataPointSpawner.Instance.DataPoints.Enqueue(datapoint);
+                RunPrediction(datapoint);
             }
         }
 
@@ -100,6 +94,15 @@ namespace Assets.KNNAlgorithm
                 newData[i - 1] = line;
             }
             return newData;
+        }
+
+        public void RunPrediction(DataPoint dataPoint)
+        {
+            int k = 1;
+            int predict = kNN.Classify(new double[3] { dataPoint.X, dataPoint.Y, dataPoint.Z }, TrainingData, Labels.Count(), k, SelectedFeatures.Count());
+            dataPoint.Label = Labels[predict];
+            dataPoint.LabelID = predict;
+            DataPointSpawner.Instance.DataPoints.Enqueue(dataPoint);
         }
 
         public List<string[]> LoadCSV(string filename)
