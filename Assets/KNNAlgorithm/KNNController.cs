@@ -26,7 +26,7 @@ namespace Assets.KNNAlgorithm
         public List<string> FeatureNames { get; set; } = new List<string>();
         public void StartPrediction()
         {
-            kNN kNN = new kNN();
+            
 
             LoadData();
 
@@ -46,17 +46,25 @@ namespace Assets.KNNAlgorithm
             int k = 1;
             foreach(var datapoint in dataPoints)
             {
-                
-                int predict = kNN.Classify(new double[3] { datapoint.X, datapoint.Y, datapoint.Z }, TrainingData, Labels.Count(), k, NumFeatures);
-                datapoint.Label = Labels[predict];
-                datapoint.LabelID = predict;
-                DataPointSpawner.Instance.DataPoints.Enqueue(datapoint);
+
+                RunPrediction(datapoint);
             }
+        }
+
+        public void RunPrediction(DataPoint dataPoint)
+        {
+            
+
+            int k = 1;
+            int predict = kNN.Classify(new double[3] { dataPoint.X, dataPoint.Y, dataPoint.Z }, TrainingData, Labels.Count(), k, NumFeatures);
+            dataPoint.Label = Labels[predict];
+            dataPoint.LabelID = predict;
+            DataPointSpawner.Instance.DataPoints.Enqueue(dataPoint);
         }
 
         public void LoadData()
         {
-            List<string[]> data = LoadCSV(@"C:\Users\Invurnable\source\repos\Teafuu\datorgrafik-visualisering\Iris.csv");
+            List<string[]> data = LoadCSV(@"C:\Users\names\source\repos\Original-Early-Access\datorgrafik-visualisering\Iris.csv");
             int unknowLenght = (data.Count() - 1) / 2;
 
             FeatureNames = data[0].ToList();

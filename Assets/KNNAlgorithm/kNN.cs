@@ -5,9 +5,9 @@ using System.Text;
 
 namespace KnnConsoleAppForUnity
 {
-    public class kNN
+    public static class kNN
     {
-        public int Classify(double[] unknown, double[][] trainData, int numClasses, int k, int numfeatures) // classifyer för knn
+        public static int Classify(double[] unknown, double[][] trainData, int numClasses, int k, int numfeatures) // classifyer för knn
         {
             int n = trainData.Length;
             IndexAndDistance[] info = new IndexAndDistance[n];
@@ -33,7 +33,7 @@ namespace KnnConsoleAppForUnity
             return result;
         }
 
-        int Vote(IndexAndDistance[] info, double[][] trainData, int numClasses, int k, int numfeatures)
+        static int Vote(IndexAndDistance[] info, double[][] trainData, int numClasses, int k, int numfeatures)
         {
             int[] votes = new int[numClasses]; // tar inte hand om dubbel data. Ta bort dubbeldata!
             for (int i =0; i < k; i++)
@@ -55,7 +55,7 @@ namespace KnnConsoleAppForUnity
             return classWithMostVotes; //returnerar den klassen som har fått mest röster dvs den som är mest runt om unknown
         } 
 
-        double Distance(double[] unknown, double[] data)
+        static double Distance(double[] unknown, double[] data)
         {
             double sum = 0.0;
             for(int i = 0; i<unknown.Length; i++)
