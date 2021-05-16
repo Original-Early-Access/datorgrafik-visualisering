@@ -23,11 +23,11 @@ namespace KnnConsoleAppForUnity
 
             Array.Sort(info); //sortera distans
 
-            for(int i = 0; i<k; i++)
+            /*for(int i = 0; i<k; i++)
             {
                 int c = (int)trainData[info[i].idx][numfeatures]; // tar bort lable eller class ändras om det finns fler featuers
                 string dist = info[i].dist.ToString();
-            }
+            }*/
 
             int result = Vote(info, trainData, numClasses, k, numfeatures);
             return result;

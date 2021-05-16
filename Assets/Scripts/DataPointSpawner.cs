@@ -7,23 +7,30 @@ using UnityEngine;
 public class DataPointSpawner : MonoBehaviour
 {
     public GameObject DataPointPrefab;
+    public List<GameObject> SpawnedDatapoints = new List<GameObject>();
     public Queue<DataPoint> DataPoints { get; set; } = new Queue<DataPoint>();
-
+    public bool Destroy { get; set; }
     public static DataPointSpawner Instance;
 
     public void Start()
     {
         Instance = this;
-        new Thread(() => KNNController.Instance.StartPrediction()).Start();
     }
 
     private void Update()
     {
+        if (Destroy)
+        {
+            ResetDatapoints();
+            Destroy = false;
+        }
         while (DataPoints.Count > 0)
         {
             var dp = DataPoints.Dequeue();
             var prefab = Instantiate(DataPointPrefab).GetComponent<DataPointHandler>();
+            SpawnedDatapoints.Add(prefab.gameObject);
             prefab.SetPrediction(dp);
         }
     }
+    public void ResetDatapoints() => SpawnedDatapoints.ForEach(data => Destroy(data));
 }

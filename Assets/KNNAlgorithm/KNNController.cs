@@ -22,13 +22,15 @@ namespace Assets.KNNAlgorithm
         public double[][] TrainingData { get; set; }
         public double[][] UnkownData { get; set; }
         public int NumFeatures { get; set; }
+        public List<string[]> data { get; set; } = new List<string[]>();
         public List<string> Labels { get; set; } = new List<string>();
         public List<string> FeatureNames { get; set; } = new List<string>();
+        public List<int> SelectedFeatures { get; set; } = new List<int>();
         public void StartPrediction()
         {
             kNN kNN = new kNN();
 
-            LoadData();
+            PrepareData();
 
             List<DataPoint> dataPoints = new List<DataPoint>();
             foreach (var value in UnkownData)
@@ -41,13 +43,13 @@ namespace Assets.KNNAlgorithm
                         Z = (float)value[2],
                     });
             }
-                
 
+            DataPointSpawner.Instance.Destroy = true;
             int k = 1;
             foreach(var datapoint in dataPoints)
             {
                 
-                int predict = kNN.Classify(new double[3] { datapoint.X, datapoint.Y, datapoint.Z }, TrainingData, Labels.Count(), k, NumFeatures);
+                int predict = kNN.Classify(new double[3] { datapoint.X, datapoint.Y, datapoint.Z }, TrainingData, Labels.Count(), k, SelectedFeatures.Count());
                 datapoint.Label = Labels[predict];
                 datapoint.LabelID = predict;
                 DataPointSpawner.Instance.DataPoints.Enqueue(datapoint);
@@ -56,24 +58,25 @@ namespace Assets.KNNAlgorithm
 
         public void LoadData()
         {
-            List<string[]> data = LoadCSV(@"C:\Users\Invurnable\source\repos\Teafuu\datorgrafik-visualisering\Iris.csv");
-            int unknowLenght = (data.Count() - 1) / 2;
-
+            data = LoadCSV(@"D:\Högskolan\År 2\Unity\Original-Early-Access\datorgrafik-visualisering\Iris.csv");
             FeatureNames = data[0].ToList();
             data.RemoveAt(0);
-            Randomize(data);
-
-            List<string[]> trainingData = new List<string[]>();
-
-            for(int i=1; i < unknowLenght; i++)
-                trainingData.Add(data[i]);
-            
 
             NumFeatures = data[0].Count() - 2;
+        }
+
+        public void PrepareData()
+        {
+            List<string[]> trainingData = new List<string[]>();
+
+            int unknowLenght = (data.Count() - 1) / 2;
+            Randomize(data);
+
+            for (int i=1; i < unknowLenght; i++)
+                trainingData.Add(data[i]);
             TrainingData = FillData(trainingData);
             UnkownData = FillData(data);
         }
-
 
         private double[][] FillData(List<string[]> data)
         {
@@ -82,14 +85,18 @@ namespace Assets.KNNAlgorithm
             for (int i = 1; i < data.Count; i++)
             {
                 double[] line = new double[4];
-                int j;
 
-                for (j = 1; j < data[i].Count() - 1; j++)
-                    line[j - 1] = double.Parse(data[i][j], CultureInfo.InvariantCulture);
-                
-                if (!Labels.Contains(data[i][j]))
-                    Labels.Add(data[i][j]);
-                line[3] = Labels.IndexOf(data[i][j]);
+                int index = 0;
+                foreach(var Selected in SelectedFeatures)
+                {
+                    line[index] = double.Parse(data[i][Selected], CultureInfo.InvariantCulture);
+                    index++;
+                }
+
+                int labelPos = data[i].Count() - 1;
+                if (!Labels.Contains(data[i][labelPos]))
+                    Labels.Add(data[i][labelPos]);
+                line[3] = Labels.IndexOf(data[i][labelPos]);
                 newData[i - 1] = line;
             }
             return newData;
