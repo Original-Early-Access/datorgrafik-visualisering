@@ -15,6 +15,9 @@ public class DataPointHandler : MonoBehaviour
     private float journeyLength;
 
     public string Label;
+    public float X;
+    public float Y;
+    public float Z;
 
     public bool ShouldInterpolate;
 
@@ -25,6 +28,9 @@ public class DataPointHandler : MonoBehaviour
         startMarker = transform.position;
         DataPoint = dp;
         Label = dp.Label;
+        X = dp.X;
+        Y = dp.Y;
+        Z = dp.Z;
         endMarker = new Vector3(dp.X, dp.Y, dp.Z);
         ShouldInterpolate = true;
 
@@ -55,5 +61,6 @@ public class DataPointHandler : MonoBehaviour
             // Set our position as a fraction of the distance between the markers.
             transform.position = Vector3.Lerp(startMarker, endMarker, fractionOfJourney);
         }
+
     }
 }
