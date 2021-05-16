@@ -74,13 +74,13 @@ namespace Assets.KNNAlgorithm
                 double[] line = new double[trainingData[i].Count()];
                 int j;
                 for (j = 1; j < trainingData[i].Count() - 1; j++)
-                {
-                    Debug.Log(trainingData[i][j]);
                     line[j - 1] = double.Parse(trainingData[i][j], CultureInfo.InvariantCulture);
-                }
-                Debug.Log(trainingData[i][j]);
+
                 if (!Labels.Contains(trainingData[i][j]))
+                {
                     Labels.Add(trainingData[i][j]);
+                    Debug.Log(trainingData[i][j]);
+                }
 
                 line[j] = Labels.IndexOf(trainingData[i][j]);
                 TrainingData[i - 1] = line;
@@ -91,12 +91,11 @@ namespace Assets.KNNAlgorithm
                 double[] line = new double[unknownData[i].Count()];
                 int j;
                 for (j = 1; j < unknownData[i].Count() - 1; j++)
-                {
                     line[j - 1] = double.Parse(unknownData[i][j], CultureInfo.InvariantCulture);
-                }
+
                 if (!Labels.Contains(unknownData[i][j]))
                     Labels.Add(unknownData[i][j]);
-
+                    
                 line[j] = Labels.IndexOf(unknownData[i][j]);
                 UnkownData[i - 1] = line;
             }
