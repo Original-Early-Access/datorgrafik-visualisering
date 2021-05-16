@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Random = System.Random;
 
 namespace Assets.KNNAlgorithm
 {
@@ -22,6 +23,7 @@ namespace Assets.KNNAlgorithm
         public double[][] UnkownData { get; set; }
         public int NumFeatures { get; set; }
         public List<string> Labels { get; set; } = new List<string>();
+        public List<string> FeatureNames { get; set; } = new List<string>();
         public void StartPrediction()
         {
             kNN kNN = new kNN();
@@ -54,52 +56,43 @@ namespace Assets.KNNAlgorithm
 
         public void LoadData()
         {
-            List<string[]> data = LoadCSV(@"D:\Högskolan\År 2\Unity\Original-Early-Access\datorgrafik-visualisering\Iris.csv");
+            List<string[]> data = LoadCSV(@"C:\Users\Invurnable\source\repos\Teafuu\datorgrafik-visualisering\Iris.csv");
             int unknowLenght = (data.Count() - 1) / 2;
-            List<string[]> unknownData = new List<string[]>();
+
+            FeatureNames = data[0].ToList();
+            data.RemoveAt(0);
+            Randomize(data);
+
             List<string[]> trainingData = new List<string[]>();
 
             for(int i=1; i < unknowLenght; i++)
-                unknownData.Add(data[i]);
-
-            for (int i = unknowLenght; i < data.Count(); i++)
                 trainingData.Add(data[i]);
-
-            TrainingData = new double[trainingData.Count()-1][];
-            UnkownData = new double[unknownData.Count()-1][];
+            
 
             NumFeatures = data[0].Count() - 2;
-            for (int i = 1; i < trainingData.Count(); i++)
+            TrainingData = FillData(trainingData);
+            UnkownData = FillData(data);
+        }
+
+
+        private double[][] FillData(List<string[]> data)
+        {
+            double[][] newData = new double[data.Count() - 1][];
+
+            for (int i = 1; i < data.Count; i++)
             {
-                double[] line = new double[trainingData[i].Count()];
+                double[] line = new double[4];
                 int j;
-                for (j = 1; j < trainingData[i].Count() - 1; j++)
-                {
-                    Debug.Log(trainingData[i][j]);
-                    line[j - 1] = double.Parse(trainingData[i][j], CultureInfo.InvariantCulture);
-                }
-                Debug.Log(trainingData[i][j]);
-                if (!Labels.Contains(trainingData[i][j]))
-                    Labels.Add(trainingData[i][j]);
 
-                line[j] = Labels.IndexOf(trainingData[i][j]);
-                TrainingData[i - 1] = line;
+                for (j = 1; j < data[i].Count() - 1; j++)
+                    line[j - 1] = double.Parse(data[i][j], CultureInfo.InvariantCulture);
+                
+                if (!Labels.Contains(data[i][j]))
+                    Labels.Add(data[i][j]);
+                line[3] = Labels.IndexOf(data[i][j]);
+                newData[i - 1] = line;
             }
-
-            for (int i = 1; i < unknownData.Count(); i++)
-            {
-                double[] line = new double[unknownData[i].Count()];
-                int j;
-                for (j = 1; j < unknownData[i].Count() - 1; j++)
-                {
-                    line[j - 1] = double.Parse(unknownData[i][j], CultureInfo.InvariantCulture);
-                }
-                if (!Labels.Contains(unknownData[i][j]))
-                    Labels.Add(unknownData[i][j]);
-
-                line[j] = Labels.IndexOf(unknownData[i][j]);
-                UnkownData[i - 1] = line;
-            }
+            return newData;
         }
 
         public List<string[]> LoadCSV(string filename)
@@ -118,6 +111,20 @@ namespace Assets.KNNAlgorithm
                 }
             }
             return data;
+        }
+        public static void Randomize<T>(List<T> items)
+        {
+            Random rand = new Random();
+
+            // For each spot in the array, pick
+            // a random item to swap into that spot.
+            for (int i = 0; i < items.Count - 1; i++)
+            {
+                int j = rand.Next(i, items.Count);
+                T temp = items[i];
+                items[i] = items[j];
+                items[j] = temp;
+            }
         }
     }
 }

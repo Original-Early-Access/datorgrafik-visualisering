@@ -64,24 +64,5 @@ namespace KnnConsoleAppForUnity
             }
             return Math.Sqrt(sum);
         }
-
-       public double[][] LoadData()
-        {
-            //ändra till filips läsdata första array är hur många och sista är värden dvs
-            // [10] == 10 styckna linjer
-            //data[0] = new double[] {2.0, 4,0, 0} 2.0=x 4.0=y 0=lable eller class. Detta är första linjen i datasettet tar endast in 2 featuers
-            //tar endast in nummer, förändra ickenummer data till nummer eller ta bort.
-
-            double[][] data = new double[3][];
-            data[0] = new double[] { 5.0, 5.0, 4.4, 1 };
-            data[1] = new double[] { 2.0, 4.0, 2.0, 0 };
-            data[2] = new double[] { 1.0, 1.0, 3.0, 2 };
-
-            // skapa unity grejorna här
-
-            return data; 
-        }
-
-
     }
 }
