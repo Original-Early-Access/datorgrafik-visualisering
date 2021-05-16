@@ -74,14 +74,15 @@ namespace Assets.KNNAlgorithm
             UnkownData = FillData(data);
         }
 
+        //lösa dom andra visualiserings teknikerna, parallel coordinates plot *---
 
         private double[][] FillData(List<string[]> data)
         {
             double[][] newData = new double[data.Count() - 1][];
 
-            for (int i = 1; i < data.Count; i++)
+            for (int i = 1; i < data.Count(); i++)
             {
-                double[] line = new double[4];
+                double[] line = new double[data[i].Count() - 1];
                 int j;
 
                 for (j = 1; j < data[i].Count() - 1; j++)
@@ -89,7 +90,7 @@ namespace Assets.KNNAlgorithm
                 
                 if (!Labels.Contains(data[i][j]))
                     Labels.Add(data[i][j]);
-                line[3] = Labels.IndexOf(data[i][j]);
+                line[j - 1] = Labels.IndexOf(data[i][j]);
                 newData[i - 1] = line;
             }
             return newData;
