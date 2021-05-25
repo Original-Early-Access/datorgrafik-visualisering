@@ -23,7 +23,7 @@ public class DataPointHandler : MonoBehaviour
 
     public Vector3 startMarker;
     public Vector3 endMarker;
-    public void SetPrediction(DataPoint dp)
+    public void SetScatterPlotPrediction(DataPoint dp)
     {
         startMarker = transform.position;
         DataPoint = dp;
@@ -47,6 +47,30 @@ public class DataPointHandler : MonoBehaviour
 
         // Calculate the journey length.
         journeyLength = Vector3.Distance(startMarker, endMarker);
+    }
+
+    public void SetParallelPlot(DataPoint dp, Vector3 pos, DataPointHandler prevDataPoint, int count)
+    {
+        startMarker = transform.position;
+        DataPoint = dp;
+        Label = dp.Label;
+        X = dp.X;
+        Y = dp.Y;
+        Z = dp.Z;
+        endMarker = new Vector3(pos.x, dp.features[count], pos.z);
+        ShouldInterpolate = true;
+
+        startTime = Time.time;
+
+        if (dp.LabelID == 0)
+            GetComponent<MeshRenderer>().material.color = Color.green;
+
+        else if (dp.LabelID == 1)
+            GetComponent<MeshRenderer>().material.color = Color.blue;
+
+        else
+            GetComponent<MeshRenderer>().material.color = Color.red;
+
     }
 
     void Update()

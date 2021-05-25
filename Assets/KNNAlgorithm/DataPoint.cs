@@ -14,5 +14,6 @@ namespace Assets.KNNAlgorithm
         public float X;
         public float Y;
         public float Z;
+        public List<float> features;
     }
 }
