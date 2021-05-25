@@ -34,13 +34,14 @@ namespace Assets.KNNAlgorithm
             List<DataPoint> dataPoints = new List<DataPoint>();
             foreach (var value in UnkownData)
             {
-                if(value != null)
+                if (value != null)
                     dataPoints.Add(new DataPoint()
                     {
                         X = (float)value[0],
                         Y = (float)value[1],
                         Z = (float)value[2],
-                    });
+                        features = value.Select(x => (float)x).ToList()
+                    }) ;
             }
 
             DataPointSpawner.Instance.Destroy = true;
