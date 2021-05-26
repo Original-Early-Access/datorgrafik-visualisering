@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using UnityEngine;
 
 namespace KnnConsoleAppForUnity
 {
@@ -21,7 +21,7 @@ namespace KnnConsoleAppForUnity
                 curr.dist = dist;
                 info[i] = curr;
             }
-
+            
             Array.Sort(info); //sortera distans
             return Vote(info, trainData, k);
         }
@@ -30,8 +30,15 @@ namespace KnnConsoleAppForUnity
         {
             int[] votes = new int[trainData.Labels.Count]; // tar inte hand om dubbel data. Ta bort dubbeldata!
 
-            for (int i =0; i < k; i++)
-                votes[trainData.DataRows[info[i].idx].LabelID]++;
+            //trainData.DataRows.ForEach(e => Debug.Log(e.LabelID));
+
+            for (int i = 0; i < k; i++)
+            {
+                int idx = info[i].idx;
+                int c = trainData.DataRows.ToArray()[idx].LabelID;
+                votes[c]++;
+            }
+                
 
             int mostVotes = 0;
             int classWithMostVotes = 0;
@@ -43,7 +50,6 @@ namespace KnnConsoleAppForUnity
                     classWithMostVotes = j;
                 }
             }
-
             return classWithMostVotes; //returnerar den klassen som har fått mest röster dvs den som är mest runt om unknown
         } 
 

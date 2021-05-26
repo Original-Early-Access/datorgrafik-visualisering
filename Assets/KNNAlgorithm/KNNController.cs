@@ -33,14 +33,11 @@ namespace Assets.KNNAlgorithm
             foreach (var value in UnkownData.DataRows)
             {
                 if (value != null)
-
                     dataPoints.Add(new DataPoint()
                     {
-                        LabelID = value.LabelID,
-                        Label = Labels[value.LabelID],
-                        X = (float)value.Values[SelectedFeatures[0]],
-                        Y = (float)value.Values[SelectedFeatures[1]],
-                        Z = (float)value.Values[SelectedFeatures[2]],
+                        X = (float)value.Values[SelectedFeatures[0]-1],
+                        Y = (float)value.Values[SelectedFeatures[1]-1],
+                        Z = (float)value.Values[SelectedFeatures[2]-1],
                     });
             }
 
@@ -83,7 +80,7 @@ namespace Assets.KNNAlgorithm
 
                 newData.DataRows.Add(new DataRow()
                 {
-                    Values = data[i].Take(data[i].Length-1).Select(value => double.Parse(value, CultureInfo.InvariantCulture)).ToList(),
+                    Values = data[i].Skip(1).Take(data[i].Length-2).Select(value => double.Parse(value, CultureInfo.InvariantCulture)).ToList(),
                     LabelID = Labels.IndexOf(data[i][labelPos])
                 });
             }
