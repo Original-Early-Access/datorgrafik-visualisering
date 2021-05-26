@@ -75,7 +75,7 @@ namespace Assets.KNNAlgorithm
         {
             DataSet newData = new DataSet();
 
-            for (int i = 1; i < data.Count; i++)
+            for (int i = 0; i < data.Count; i++)
             {
                 int labelPos = data[i].Count() - 1;
                 if (!Labels.Contains(data[i][labelPos]))
@@ -83,7 +83,7 @@ namespace Assets.KNNAlgorithm
 
                 newData.DataRows.Add(new DataRow()
                 {
-                    Values = data[i].Select(value => double.Parse(value, CultureInfo.InvariantCulture)).ToList(),
+                    Values = data[i].Take(data[i].Length-1).Select(value => double.Parse(value, CultureInfo.InvariantCulture)).ToList(),
                     LabelID = Labels.IndexOf(data[i][labelPos])
                 });
             }
