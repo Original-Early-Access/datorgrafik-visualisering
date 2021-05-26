@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.KNNAlgorithm;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,44 +8,34 @@ namespace KnnConsoleAppForUnity
 {
     public static class kNN
     {
-        public static int Classify(double[] unknown, double[][] trainData, int numClasses, int k, int numfeatures) // classifyer för knn
+        public static int Classify(double[] unknown, DataSet trainData, int k)
         {
-            int n = trainData.Length;
-            IndexAndDistance[] info = new IndexAndDistance[n];
+            int rowCount = trainData.DataRows.Count;
+            IndexAndDistance[] info = new IndexAndDistance[rowCount];
 
-            for(int i = 0; i < n; i++)
+            for(int i = 0; i < rowCount; i++)
             {
                 IndexAndDistance curr = new IndexAndDistance();
-                double dist = Distance(unknown, trainData[i]);
+                double dist = Distance(unknown, trainData.DataRows[i].Values.ToArray());
                 curr.idx = i;
                 curr.dist = dist;
                 info[i] = curr;
             }
 
             Array.Sort(info); //sortera distans
-
-            /*for(int i = 0; i<k; i++)
-            {
-                int c = (int)trainData[info[i].idx][numfeatures]; // tar bort lable eller class ändras om det finns fler featuers
-                string dist = info[i].dist.ToString();
-            }*/
-
-            int result = Vote(info, trainData, numClasses, k, numfeatures);
-            return result;
+            return Vote(info, trainData, k);
         }
 
-        static int Vote(IndexAndDistance[] info, double[][] trainData, int numClasses, int k, int numfeatures)
+        static int Vote(IndexAndDistance[] info, DataSet trainData, int k)
         {
-            int[] votes = new int[numClasses]; // tar inte hand om dubbel data. Ta bort dubbeldata!
+            int[] votes = new int[trainData.Labels.Count]; // tar inte hand om dubbel data. Ta bort dubbeldata!
+
             for (int i =0; i < k; i++)
-            {
-                int idx = info[i].idx;
-                int c = (int)trainData[idx][numfeatures]; // tar ut lables ändras om det finns fler featurs
-                votes[c]++;
-            }
+                votes[trainData.DataRows[info[i].idx].LabelID]++;
+
             int mostVotes = 0;
             int classWithMostVotes = 0;
-            for( int j = 0; j< numClasses; j++)
+            for( int j = 0; j < trainData.Labels.Count; j++)
             {
                 if (votes[j] > mostVotes)
                 {
@@ -52,6 +43,7 @@ namespace KnnConsoleAppForUnity
                     classWithMostVotes = j;
                 }
             }
+
             return classWithMostVotes; //returnerar den klassen som har fått mest röster dvs den som är mest runt om unknown
         } 
 

@@ -413,8 +413,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 487de49451967e34590a6ade1ee2f3f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shouldUseScatterPlot: 0
   DataPointPrefab: {fileID: 1146426552815413096, guid: 402d71a95e739594c90a10eb508f1f4c, type: 3}
   SpawnedDatapoints: []
+  FeaturesList: []
 --- !u!4 &809447728
 Transform:
   m_ObjectHideFlags: 0
@@ -519,6 +521,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2078565224}
     m_Modifications:
+    - target: {fileID: 4761676611012220349, guid: 2c3722894e56f0b4ea643c770c11a385, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 4761676611185452999, guid: 2c3722894e56f0b4ea643c770c11a385, type: 3}
+    - target: {fileID: 4761676611012220349, guid: 2c3722894e56f0b4ea643c770c11a385, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ChangeFeatures
+      objectReference: {fileID: 0}
     - target: {fileID: 4761676611185453000, guid: 2c3722894e56f0b4ea643c770c11a385, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -529,7 +539,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4761676611185453000, guid: 2c3722894e56f0b4ea643c770c11a385, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4761676611185453000, guid: 2c3722894e56f0b4ea643c770c11a385, type: 3}
       propertyPath: m_AnchorMax.x

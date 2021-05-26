@@ -28,14 +28,11 @@ public class DataPointSpawner : MonoBehaviour
         }
         while (DataPoints.Count > 0)
         {
-
-            if (shouldUseScatterPlot)
-            {
-                var dp = DataPoints.Dequeue();
-                var prefab = Instantiate(DataPointPrefab).GetComponent<DataPointHandler>();
-                SpawnedDatapoints.Add(prefab.gameObject);
-                prefab.SetScatterPlotPrediction(dp);
-            }
+            var dp = DataPoints.Dequeue();
+            var prefab = Instantiate(DataPointPrefab).GetComponent<DataPointHandler>();
+            SpawnedDatapoints.Add(prefab.gameObject);
+            prefab.SetScatterPlotPrediction(dp);
+            /*
             else
             {
                 var dp = DataPoints.Dequeue();
@@ -50,7 +47,7 @@ public class DataPointSpawner : MonoBehaviour
                     PrevDataPoint = prefab;
                     count++;
                 }
-            }
+            }*/
 
         }
     }

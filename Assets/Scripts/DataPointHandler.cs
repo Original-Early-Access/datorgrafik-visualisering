@@ -57,7 +57,7 @@ public class DataPointHandler : MonoBehaviour
         X = dp.X;
         Y = dp.Y;
         Z = dp.Z;
-        endMarker = new Vector3(pos.x, dp.features[count], pos.z);
+        //endMarker = new Vector3(pos.x, dp.features[count], pos.z);
         ShouldInterpolate = true;
 
         startTime = Time.time;
