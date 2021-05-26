@@ -9,6 +9,8 @@ namespace Assets.KNNAlgorithm
     public class DataRow
     {
         public List<double> Values { get; set; } = new List<double>();
+        public DataPoint DataPoint;
         public int LabelID { get; set; }
+        public string Label { get; set; }
     }
 }

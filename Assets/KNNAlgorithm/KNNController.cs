@@ -25,27 +25,30 @@ namespace Assets.KNNAlgorithm
         public List<string> Labels { get; set; } = new List<string>();
         public List<string> FeatureNames { get; set; } = new List<string>();
         public List<int> SelectedFeatures { get; set; } = new List<int>();
-        public void StartPrediction()
+        public void StartPrediction(bool ShouldUseScatterplot=true)
         {
             PrepareData();
-            List<DataPoint> dataPoints = new List<DataPoint>();
-
-            foreach (var value in UnkownData.DataRows)
-            {
-                if (value != null)
-                    dataPoints.Add(new DataPoint()
-                    {
-                        X = (float)value.Values[SelectedFeatures[0]-1],
-                        Y = (float)value.Values[SelectedFeatures[1]-1],
-                        Z = (float)value.Values[SelectedFeatures[2]-1],
-                    });
+            if (ShouldUseScatterplot) { 
+                foreach (var value in UnkownData.DataRows)
+                {
+                    if (value != null) {
+                  
+                        var dp = new DataPoint()
+                        {
+                            X = (float)value.Values[SelectedFeatures[0] - 1],
+                            Y = (float)value.Values[SelectedFeatures[1] - 1],
+                            Z = (float)value.Values[SelectedFeatures[2] - 1],
+                        };
+                        value.DataPoint = dp;
+                    }
+                }
             }
-
             DataPointSpawner.Instance.Destroy = true;
-            dataPoints.ForEach(d => RunPrediction(d));
+            UnkownData.DataRows.ForEach(d => RunPrediction(d, shouldUseDatapoint: ShouldUseScatterplot));
+
         }
 
-        public void LoadData(string csv = @"D:\Högskolan\År 2\Unity\Original-Early-Access\datorgrafik-visualisering\Iris.csv")
+        public void LoadData(string csv = "Iris.csv")
         {
             data = LoadCSV(csv);
             FeatureNames = data[0].ToList();
@@ -83,16 +86,21 @@ namespace Assets.KNNAlgorithm
                     Values = data[i].Skip(1).Take(data[i].Length-2).Select(value => double.Parse(value, CultureInfo.InvariantCulture)).ToList(),
                     LabelID = Labels.IndexOf(data[i][labelPos])
                 });
+
             }
             return newData;
         }
 
-        public void RunPrediction(DataPoint dataPoint, int k = 1)
+        public void RunPrediction(DataRow dataRow, int k = 1, bool shouldUseDatapoint=false)
         {
-            int predict = kNN.Classify(new double[3] { dataPoint.X, dataPoint.Y, dataPoint.Z }, TrainingData, k);
-            dataPoint.Label = Labels[predict];
-            dataPoint.LabelID = predict;
-            DataPointSpawner.Instance.DataPoints.Enqueue(dataPoint);
+            int predict = 0;
+            if (shouldUseDatapoint)
+                predict = kNN.Classify(new double[] { dataRow.DataPoint.X, dataRow.DataPoint.Y, dataRow.DataPoint.Z }, TrainingData, k);
+            else predict = kNN.Classify(dataRow.Values.Select(val => (double)val).ToArray(), TrainingData, k);
+
+            dataRow.Label = Labels[predict];
+            dataRow.LabelID = predict;
+            DataPointSpawner.Instance.DataPoints.Enqueue(dataRow);
         }
 
         public List<string[]> LoadCSV(string filename)

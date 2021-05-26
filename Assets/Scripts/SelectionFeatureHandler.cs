@@ -25,10 +25,12 @@ public class SelectionFeatureHandler : MonoBehaviour
 
     public void ChangeFeatures()
     {
-        KNNController.Instance.SelectedFeatures.Clear();
-        KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
-        KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
-        KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
-        new Thread(() => KNNController.Instance.StartPrediction()).Start();
+        if (DataPointSpawner.Instance.shouldUseScatterPlot) { 
+            KNNController.Instance.SelectedFeatures.Clear();
+            KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
+            KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
+            KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
+        }
+        new Thread(() => KNNController.Instance.StartPrediction(DataPointSpawner.Instance.shouldUseScatterPlot)).Start();
     }
 }

@@ -9,8 +9,6 @@ namespace Assets.KNNAlgorithm
 {
     public class DataPoint
     {
-        public int LabelID;
-        public string Label;
         public float X;
         public float Y;
         public float Z;

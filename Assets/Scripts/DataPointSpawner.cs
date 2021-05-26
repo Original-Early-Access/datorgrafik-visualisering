@@ -8,11 +8,17 @@ public class DataPointSpawner : MonoBehaviour
 {
     public bool shouldUseScatterPlot;
     public GameObject DataPointPrefab;
+    public GameObject CategoryPrefab;
+
     public List<GameObject> SpawnedDatapoints = new List<GameObject>();
-    public List<GameObject> FeaturesList = new List<GameObject>();
-    public Queue<DataPoint> DataPoints { get; set; } = new Queue<DataPoint>();
+    public List<GameObject> Categories = new List<GameObject>();
+
+    public Queue<DataRow> DataPoints { get; set; } = new Queue<DataRow>();
     public bool Destroy { get; set; }
     public static DataPointSpawner Instance;
+    public bool CategoryExists;
+
+    public int OffsetValueForCategories = 5;
 
     public void Start()
     {
@@ -29,26 +35,41 @@ public class DataPointSpawner : MonoBehaviour
         while (DataPoints.Count > 0)
         {
             var dp = DataPoints.Dequeue();
-            var prefab = Instantiate(DataPointPrefab).GetComponent<DataPointHandler>();
-            SpawnedDatapoints.Add(prefab.gameObject);
-            prefab.SetScatterPlotPrediction(dp);
-            /*
+
+            if (shouldUseScatterPlot) { 
+                var prefab = Instantiate(DataPointPrefab).GetComponent<DataPointHandler>();
+                SpawnedDatapoints.Add(prefab.gameObject);
+                prefab.SetScatterPlotPrediction(dp);
+            }
             else
             {
-                var dp = DataPoints.Dequeue();
+                if (!CategoryExists) { 
+                    InstantiateCategories();
+                    CategoryExists = true;
+                }
                 DataPointHandler PrevDataPoint = null;
                 int count = 0;
-                foreach(var feature in FeaturesList)
+                foreach(var category in Categories)
                 { 
-                    
                     var prefab = Instantiate(DataPointPrefab).GetComponent<DataPointHandler>();
                     SpawnedDatapoints.Add(prefab.gameObject);
-                    prefab.SetParallelPlot(dp, feature.transform.position, PrevDataPoint, count);
+                    prefab.SetParallelPlot(dp, category.transform.position, PrevDataPoint, count);
                     PrevDataPoint = prefab;
                     count++;
                 }
-            }*/
 
+            }
+
+        }
+    }
+
+    public void InstantiateCategories(){
+        Vector3 offset = new Vector3(0, 0, 0);
+        for(int i = 0; i < KNNController.Instance.FeatureNames.Count - 2; i++) // -2 BECAUSE STOOPID ID UNT OTHER THING :)
+        {
+            var prefab = Instantiate(CategoryPrefab, offset, Quaternion.identity);
+            Categories.Add(prefab);
+            offset = new Vector3(offset.x + OffsetValueForCategories, offset.y, offset.z);
         }
     }
     public void ResetDatapoints() => SpawnedDatapoints.ForEach(data => Destroy(data));
