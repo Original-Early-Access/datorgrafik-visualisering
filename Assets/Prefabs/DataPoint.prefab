@@ -106,7 +106,7 @@ MonoBehaviour:
   Y: 0
   Z: 0
   LineWidth: 0.05
-  ShouldInterpolate: 0
+  ShouldInterpolate: 1
   startMarker: {x: 0, y: 0, z: 0}
   endMarker: {x: 0, y: 0, z: 0}
   journeyEnded: 0

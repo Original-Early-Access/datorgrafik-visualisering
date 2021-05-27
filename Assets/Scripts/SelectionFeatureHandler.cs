@@ -11,16 +11,10 @@ public class SelectionFeatureHandler : MonoBehaviour
     public DropDownHandler Feature_1;
     public DropDownHandler Feature_2;
     public DropDownHandler Feature_3;
-    // Start is called before the first frame update
+
     void Start()
     {
         KNNController.Instance.LoadData();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void ChangeFeatures()
@@ -31,6 +25,6 @@ public class SelectionFeatureHandler : MonoBehaviour
             KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
             KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
         }
-        new Thread(() => KNNController.Instance.StartPrediction(DataPointSpawner.Instance.shouldUseScatterPlot)).Start();
+        //new Thread(() => KNNController.Instance.StartPrediction(DataPointSpawner.Instance.shouldUseScatterPlot)).Start();
     }
 }

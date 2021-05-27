@@ -12,18 +12,6 @@ public class AddNewDataPoint : MonoBehaviour
     public InputField DataPointX;
     public InputField DataPointZ;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void SetDataPoints()
     {
         DataRow dataRow = new DataRow();
@@ -32,6 +20,6 @@ public class AddNewDataPoint : MonoBehaviour
         dataRow.DataPoint.Y = float.Parse(DataPointY.text, CultureInfo.InvariantCulture);
         dataRow.DataPoint.Z = float.Parse(DataPointZ.text, CultureInfo.InvariantCulture);
 
-        KNNController.Instance.RunPrediction(dataRow);
+        //KNNController.Instance.RunPrediction(dataRow);
     }
 }

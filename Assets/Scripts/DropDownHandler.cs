@@ -7,17 +7,10 @@ using UnityEngine.UI;
 public class DropDownHandler : MonoBehaviour
 {
     public Dropdown dropdown;
-    // Start is called before the first frame update
     void Start()
     {
         dropdown = GetComponent<Dropdown>();
         PopulateDropdown();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-       
     }
 
     void PopulateDropdown()

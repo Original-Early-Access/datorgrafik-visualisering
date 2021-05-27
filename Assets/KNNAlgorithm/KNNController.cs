@@ -25,7 +25,7 @@ namespace Assets.KNNAlgorithm
         public List<string> Labels { get; set; } = new List<string>();
         public List<string> FeatureNames { get; set; } = new List<string>();
         public List<int> SelectedFeatures { get; set; } = new List<int>();
-        public void StartPrediction(bool ShouldUseScatterplot=true)
+        public void StartPrediction(bool ShouldUseScatterplot, int k, int PlotID, int CSVTypeID)
         {
             PrepareData();
             if (ShouldUseScatterplot) { 
@@ -44,8 +44,7 @@ namespace Assets.KNNAlgorithm
                 }
             }
             DataPointSpawner.Instance.Destroy = true;
-            UnkownData.DataRows.ForEach(d => RunPrediction(d, shouldUseDatapoint: ShouldUseScatterplot));
-
+            UnkownData.DataRows.ForEach(d => RunPrediction(d, k, ShouldUseScatterplot));
         }
 
         public void LoadData(string csv = "Iris.csv")
@@ -91,7 +90,7 @@ namespace Assets.KNNAlgorithm
             return newData;
         }
 
-        public void RunPrediction(DataRow dataRow, int k = 1, bool shouldUseDatapoint=false)
+        public void RunPrediction(DataRow dataRow, int k, bool shouldUseDatapoint)
         {
             int predict = 0;
             if (shouldUseDatapoint)

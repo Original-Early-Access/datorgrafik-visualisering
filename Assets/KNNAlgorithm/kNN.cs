@@ -30,8 +30,6 @@ namespace KnnConsoleAppForUnity
         {
             int[] votes = new int[trainData.Labels.Count]; // tar inte hand om dubbel data. Ta bort dubbeldata!
 
-            //trainData.DataRows.ForEach(e => Debug.Log(e.LabelID));
-
             for (int i = 0; i < k; i++)
             {
                 int idx = info[i].idx;
