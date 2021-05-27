@@ -13,6 +13,7 @@ public class InitializeData : MonoBehaviour
     public Dropdown CSVType;
     public GameObject MainPanel;
     public DataPointSpawner pointSpawner;
+    public NavbarHandler navbarToggle;
 
     public DropDownHandler Feature_1;
     public DropDownHandler Feature_2;
@@ -23,21 +24,26 @@ public class InitializeData : MonoBehaviour
         if (KValue.text != "") // CSV NAME MÅSTE KOLLAS OXÅ SENNARE
         {
             KNNController.Instance.LoadData();
-            if (PlotMode.value != 0)
-            {
-                new Thread(() => KNNController.Instance.StartPrediction(false, int.Parse(KValue.text), PlotMode.value, CSVType.value)).Start();
-                pointSpawner.shouldUseScatterPlot = false;
-            }
-            else
-            {
-                pointSpawner.shouldUseScatterPlot = true;
-                KNNController.Instance.SelectedFeatures.Clear();
-                KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
-                KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
-                KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
-                new Thread(() => KNNController.Instance.StartPrediction(true, int.Parse(KValue.text), PlotMode.value, CSVType.value)).Start();
-            } 
+            StartPlot();
             MainPanel.SetActive(false);
+            navbarToggle.ToggleInRuntimeNavbar();
+        }
+    }
+    public void StartPlot()
+    {
+        if (PlotMode.value != 0)
+        {
+            new Thread(() => KNNController.Instance.StartPrediction(false, int.Parse(KValue.text), PlotMode.value, CSVType.value)).Start();
+            pointSpawner.shouldUseScatterPlot = false;
+        }
+        else
+        {
+            pointSpawner.shouldUseScatterPlot = true;
+            KNNController.Instance.SelectedFeatures.Clear();
+            KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
+            KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
+            KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
+            new Thread(() => KNNController.Instance.StartPrediction(true, int.Parse(KValue.text), PlotMode.value, CSVType.value)).Start();
         }
     }
 }
