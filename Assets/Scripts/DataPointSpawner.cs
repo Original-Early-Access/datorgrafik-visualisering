@@ -9,28 +9,31 @@ public class DataPointSpawner : MonoBehaviour
     public bool shouldUseScatterPlot;
     public GameObject DataPointPrefab;
     public GameObject CategoryPrefab;
+    public GameObject CategoryMatrixPrefab;
+
+    public GameObject Camera2D;
+    public GameObject Camera3D;
+    public GameObject Wall2D;
 
     public List<GameObject> SpawnedDatapoints = new List<GameObject>();
     public List<GameObject> Categories = new List<GameObject>();
-
+    public List<MatrixCategory> MatrixCategories = new List<MatrixCategory>();
     public Queue<DataRow> DataPoints { get; set; } = new Queue<DataRow>();
-    public bool Destroy { get; set; }
+    public bool ShouldResetDataPoints { get; set; }
     public static DataPointSpawner Instance;
     public bool CategoryExists;
 
     public int OffsetValueForCategories = 5;
+    public float OffsetValueForMatrixCategories = 0.05f;
 
-    public void Start()
-    {
-        Instance = this;
-    }
+    public void Start() => Instance = this;
 
     private void Update()
     {
-        if (Destroy)
+        if (ShouldResetDataPoints)
         {
             ResetDatapoints();
-            Destroy = false;
+            ShouldResetDataPoints = false;
         }
         while (DataPoints.Count > 0)
         {
@@ -72,5 +75,21 @@ public class DataPointSpawner : MonoBehaviour
             offset = new Vector3(offset.x + OffsetValueForCategories, offset.y, offset.z);
         }
     }
-    public void ResetDatapoints() => SpawnedDatapoints.ForEach(data => Destroy(data));
+
+    public void InstantiateMatrixCateogires()
+    {
+        Vector3 offset = new Vector3(0, 0, 0);
+        for (int i = 1; i < KNNController.Instance.FeatureNames.Count - 1; i++) // -2 BECAUSE STOOPID ID UNT OTHER THING :)
+        {
+            var prefab = Instantiate(CategoryMatrixPrefab, offset, Quaternion.identity).GetComponent<MatrixCategory>();
+            prefab.FeatureLabel = KNNController.Instance.FeatureNames[i];
+            prefab.FeatureID = i;
+            MatrixCategories.Add(prefab);
+            offset = new Vector3(offset.x + OffsetValueForMatrixCategories, offset.y + OffsetValueForMatrixCategories, offset.z);
+        }
+    }
+    public void ResetDatapoints() {
+        SpawnedDatapoints.ForEach(data => Destroy(data));
+        Categories.ForEach(category => Destroy(category));
+    }
 }

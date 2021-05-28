@@ -8,7 +8,7 @@ namespace KnnConsoleAppForUnity
 {
     public static class kNN
     {
-        public static int Classify(double[] unknown, DataSet trainData, int k)
+        public static int Classify(DataRow dataRow, DataSet trainData, int k)
         {
             int rowCount = trainData.DataRows.Count;
             IndexAndDistance[] info = new IndexAndDistance[rowCount];
@@ -16,7 +16,7 @@ namespace KnnConsoleAppForUnity
             for(int i = 0; i < rowCount; i++)
             {
                 IndexAndDistance curr = new IndexAndDistance();
-                double dist = Distance(unknown, trainData.DataRows[i].Values.ToArray());
+                double dist = Distance(dataRow, trainData.DataRows[i].AllValues.ToArray());
                 curr.idx = i;
                 curr.dist = dist;
                 info[i] = curr;
@@ -51,13 +51,13 @@ namespace KnnConsoleAppForUnity
             return classWithMostVotes; //returnerar den klassen som har fått mest röster dvs den som är mest runt om unknown
         } 
 
-        static double Distance(double[] unknown, double[] data)
+        static double Distance(DataRow dataRow, double[] data)
         {
             double sum = 0.0;
-            for(int i = 0; i<unknown.Length; i++)
-            {
-                sum += Math.Pow((unknown[i] - data[i]), 2);
-            }
+
+            for(int i = 0; i < dataRow.FeatureIDs.Count; i++)
+                sum += Math.Pow(dataRow.kNNValues[i] - data[dataRow.FeatureIDs[i] - 1], 2);
+
             return Math.Sqrt(sum);
         }
     }

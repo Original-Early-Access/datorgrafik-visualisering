@@ -25,27 +25,56 @@ namespace Assets.KNNAlgorithm
         public List<string> Labels { get; set; } = new List<string>();
         public List<string> FeatureNames { get; set; } = new List<string>();
         public List<int> SelectedFeatures { get; set; } = new List<int>();
-        public void StartPrediction(bool ShouldUseScatterplot, int k, int PlotID)
+        public void StartPrediction(bool shouldUseScatterPlot, int k, int PlotID)
         {
             PrepareData();
-            if (ShouldUseScatterplot) { 
-                foreach (var value in UnkownData.DataRows)
+            DataPointSpawner.Instance.ShouldResetDataPoints = true;
+            if (shouldUseScatterPlot) { 
+                foreach (var row in UnkownData.DataRows)
                 {
-                    if (value != null) {
-                  
-                        var dp = new DataPoint()
-                        {
-                            X = (float)value.Values[SelectedFeatures[0] - 1],
-                            Y = (float)value.Values[SelectedFeatures[1] - 1],
-                            Z = (float)value.Values[SelectedFeatures[2] - 1],
-                        };
-                        value.DataPoint = dp;
+                    if (row != null) {
+                        RunPrediction(row, new double[] {
+                                (float)row.AllValues[SelectedFeatures[0] - 1],
+                                (float)row.AllValues[SelectedFeatures[1] - 1],
+                                (float)row.AllValues[SelectedFeatures[2] - 1] },
+                            k,
+                            shouldUseScatterPlot);
                     }
                 }
             }
-            DataPointSpawner.Instance.Destroy = true;
-            UnkownData.DataRows.ForEach(d => RunPrediction(d, k, ShouldUseScatterplot));
+            else
+            {
+                SelectedFeatures.Clear();
+                for (int i = 1; i < FeatureNames.Count - 1; i++)
+                    SelectedFeatures.Add(i);
+                UnkownData.DataRows.ForEach(d => RunPrediction(d, d.AllValues.Select(val => (double)val).ToArray(), k, shouldUseScatterPlot));
+            }
+        }   
+        public void RunPrediction(DataRow dataRow, double[] values, int k, bool shouldUseDatapoint)
+        {
+            dataRow.kNNValues = values;
+            dataRow.FeatureIDs = SelectedFeatures;
+            
+            int predict = kNN.Classify(dataRow, TrainingData, k);
+
+            dataRow.Label = Labels[predict];
+            dataRow.LabelID = predict;
+            
+            DataPointSpawner.Instance.DataPoints.Enqueue(dataRow);
         }
+
+        /*
+        public void RunPrediction(DataRow dataRow, int k, bool shouldUseDatapoint)
+        {
+            int predict = 0;
+            if (shouldUseDatapoint)
+                predict = kNN.Classify(new double[] { dataRow.DataPoint.X, dataRow.DataPoint.Y, dataRow.DataPoint.Z }, TrainingData, k);
+            else predict = kNN.Classify(dataRow.Values.Select(val => (double)val).ToArray(), TrainingData, k);
+
+            dataRow.Label = Labels[predict];
+            dataRow.LabelID = predict;
+            DataPointSpawner.Instance.DataPoints.Enqueue(dataRow);
+        }*/
 
         public void LoadData(string csv = "Iris.csv")
         {
@@ -82,7 +111,7 @@ namespace Assets.KNNAlgorithm
 
                 newData.DataRows.Add(new DataRow()
                 {
-                    Values = data[i].Skip(1).Take(data[i].Length-2).Select(value => double.Parse(value, CultureInfo.InvariantCulture)).ToList(),
+                    AllValues = data[i].Skip(1).Take(data[i].Length-2).Select(value => double.Parse(value, CultureInfo.InvariantCulture)).ToList(),
                     LabelID = Labels.IndexOf(data[i][labelPos])
                 });
 
@@ -90,17 +119,6 @@ namespace Assets.KNNAlgorithm
             return newData;
         }
 
-        public void RunPrediction(DataRow dataRow, int k, bool shouldUseDatapoint)
-        {
-            int predict = 0;
-            if (shouldUseDatapoint)
-                predict = kNN.Classify(new double[] { dataRow.DataPoint.X, dataRow.DataPoint.Y, dataRow.DataPoint.Z }, TrainingData, k);
-            else predict = kNN.Classify(dataRow.Values.Select(val => (double)val).ToArray(), TrainingData, k);
-
-            dataRow.Label = Labels[predict];
-            dataRow.LabelID = predict;
-            DataPointSpawner.Instance.DataPoints.Enqueue(dataRow);
-        }
 
         public List<string[]> LoadCSV(string filename)
         {

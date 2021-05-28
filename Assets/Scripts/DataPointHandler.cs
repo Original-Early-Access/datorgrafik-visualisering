@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class DataPointHandler : MonoBehaviour
 {
-    public DataPoint DataPoint;
     public DataRow DataRow;
     public DataPointHandler PreviousDataPoint;
     public LineRenderer lineRenderer;
@@ -41,12 +40,10 @@ public class DataPointHandler : MonoBehaviour
     public void SetScatterPlotPrediction(DataRow dataRow)
     {
         startMarker = transform.position;
-        DataPoint = dataRow.DataPoint;
-        Label = dataRow.Label;
-        X = DataPoint.X;
-        Y = DataPoint.Y;
-        Z = DataPoint.Z;
-        endMarker = new Vector3(DataPoint.X, DataPoint.Y, DataPoint.Z);
+        X = (float)dataRow.kNNValues[0];
+        Y = (float)dataRow.kNNValues[1];
+        Z = (float)dataRow.kNNValues[2];
+        endMarker = new Vector3(X, Y, Z);
         ShouldInterpolate = true;
 
         startTime = Time.time;
@@ -70,7 +67,7 @@ public class DataPointHandler : MonoBehaviour
 
     public void SetParallelPlot(DataRow dataRow, Vector3 pos, DataPointHandler prevDataPoint, int count)
     {
-        endMarker = new Vector3(pos.x, (float)dataRow.Values[count] * 2, pos.z);
+        endMarker = new Vector3(pos.x, (float)dataRow.AllValues[count] * 2, pos.z);
         PreviousDataPoint = prevDataPoint;
         DataRow = dataRow;
         // add some logic for drawing big line to prevdatapoint;
@@ -94,6 +91,10 @@ public class DataPointHandler : MonoBehaviour
 
     }
 
+    public void SetMatrixPLot(DataRow dataRow, Vector3 pos)
+    {
+
+    }
     void Update()
     {
         if (ShouldInterpolate && !journeyEnded) { 

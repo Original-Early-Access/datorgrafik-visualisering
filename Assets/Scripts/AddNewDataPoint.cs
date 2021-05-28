@@ -15,10 +15,9 @@ public class AddNewDataPoint : MonoBehaviour
     public void SetDataPoints()
     {
         DataRow dataRow = new DataRow();
-        dataRow.DataPoint = new DataPoint();
-        dataRow.DataPoint.X = float.Parse(DataPointX.text, CultureInfo.InvariantCulture);
-        dataRow.DataPoint.Y = float.Parse(DataPointY.text, CultureInfo.InvariantCulture);
-        dataRow.DataPoint.Z = float.Parse(DataPointZ.text, CultureInfo.InvariantCulture);
+        dataRow.kNNValues[0] = float.Parse(DataPointX.text, CultureInfo.InvariantCulture);
+        dataRow.kNNValues[1] = float.Parse(DataPointY.text, CultureInfo.InvariantCulture);
+        dataRow.kNNValues[2] = float.Parse(DataPointZ.text, CultureInfo.InvariantCulture);
 
         //KNNController.Instance.RunPrediction(dataRow);
     }

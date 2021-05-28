@@ -8,8 +8,10 @@ namespace Assets.KNNAlgorithm
 {
     public class DataRow
     {
-        public List<double> Values { get; set; } = new List<double>();
-        public DataPoint DataPoint;
+        public List<double> AllValues { get; set; } = new List<double>();
+        public double[] kNNValues { get; set; }
+
+        public List<int> FeatureIDs { get; set; } = new List<int>();
         public int LabelID { get; set; }
         public string Label { get; set; }
     }
