@@ -25,7 +25,7 @@ namespace Assets.KNNAlgorithm
         public List<string> Labels { get; set; } = new List<string>();
         public List<string> FeatureNames { get; set; } = new List<string>();
         public List<int> SelectedFeatures { get; set; } = new List<int>();
-        public void StartPrediction(bool ShouldUseScatterplot, int k, int PlotID, int CSVTypeID)
+        public void StartPrediction(bool ShouldUseScatterplot, int k, int PlotID)
         {
             PrepareData();
             if (ShouldUseScatterplot) { 

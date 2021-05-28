@@ -23,7 +23,7 @@ public class InitializeData : MonoBehaviour
     {
         if (KValue.text != "") // CSV NAME MÅSTE KOLLAS OXÅ SENNARE
         {
-            KNNController.Instance.LoadData();
+            KNNController.Instance.LoadData(); //, CSVType.value
             StartPlot();
             MainPanel.SetActive(false);
             navbarToggle.ToggleInRuntimeNavbar();
@@ -31,19 +31,28 @@ public class InitializeData : MonoBehaviour
     }
     public void StartPlot()
     {
-        if (PlotMode.value != 0)
+        if(KValue.text != "")
         {
-            new Thread(() => KNNController.Instance.StartPrediction(false, int.Parse(KValue.text), PlotMode.value, CSVType.value)).Start();
-            pointSpawner.shouldUseScatterPlot = false;
+            if (PlotMode.value != 0)
+            {
+                new Thread(() => KNNController.Instance.StartPrediction(false, int.Parse(KValue.text), PlotMode.value)).Start();
+                pointSpawner.shouldUseScatterPlot = false;
+            }
+            else
+            {
+                pointSpawner.shouldUseScatterPlot = true;
+                KNNController.Instance.SelectedFeatures.Clear();
+                KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
+                KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
+                KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
+                new Thread(() => KNNController.Instance.StartPrediction(true, int.Parse(KValue.text), PlotMode.value)).Start();
+            }
         }
-        else
-        {
-            pointSpawner.shouldUseScatterPlot = true;
-            KNNController.Instance.SelectedFeatures.Clear();
-            KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
-            KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
-            KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
-            new Thread(() => KNNController.Instance.StartPrediction(true, int.Parse(KValue.text), PlotMode.value, CSVType.value)).Start();
-        }
+    }
+
+    public void ChangePlot()
+    {
+        StartPlot();
+        navbarToggle.ToggleChangePlotMode();
     }
 }
