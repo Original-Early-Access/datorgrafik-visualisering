@@ -55,4 +55,5 @@ public class InitializeData : MonoBehaviour
         StartPlot();
         navbarToggle.ToggleChangePlotMode();
     }
+
 }
