@@ -3036,6 +3036,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shouldUseScatterPlot: 0
   shouldUseParallelPlot: 0
+  ShouldUseWeights: 0
   DataPointPrefab: {fileID: 1146426552815413096, guid: 402d71a95e739594c90a10eb508f1f4c, type: 3}
   CategoryPrefab: {fileID: 8831997758305061808, guid: 92c56c791cf001c4f857ecacc2238b4a, type: 3}
   CategoryMatrixPrefab: {fileID: 778582726677908843, guid: 029e21751d82f33408d847f47954da93, type: 3}
@@ -3045,9 +3046,42 @@ MonoBehaviour:
   SpawnedDatapoints: []
   Categories: []
   MatrixCategories: []
+  Colors: []
   DataPointInformationHandler: {fileID: 265046906}
+  DataPlotterHandler: {fileID: 1958252442}
   CategoryExists: 0
   OffsetValueForCategories: 5
+  ShouldUseRegressor: 0
+  gradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  IncremenetGradientValue: 0
 --- !u!4 &809447728
 Transform:
   m_ObjectHideFlags: 0

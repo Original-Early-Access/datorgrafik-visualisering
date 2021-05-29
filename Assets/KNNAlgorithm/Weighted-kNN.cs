@@ -29,37 +29,29 @@ namespace KnnConsoleAppForUnity
             {
                 int idx = ordering[i];
                 Show(data[idx]);
-                Console.WriteLine("     distamce=" + distances[idx].ToString("F4"));
                 kNearestDists[i] = distances[idx];
             }
             // vote
             double[] votes = new double[c]; // en per lable/class
             double[] wts = MakeWeights(k, kNearestDists);
-            Console.WriteLine("Weights(inverse technique):  ");
-            for(int i = 0; i < wts.Length; i++)
-            {
-                Console.WriteLine(wts[i].ToString("F4") + "  ");
-            }
-            Console.WriteLine("\n\nPredicted class: ");
+
             for( int i= 0; i< k; i++)
             {
                 int idx = ordering[i];
                 int predClass = (int)data[idx][3]; //hämta ut lable/class ändra 3an om fel plats
-                votes[predClass] += wts[i] * 1.0;
+                votes[predClass] += wts[i];
             }
             double predictmaxWeight = 0.0; //hitta störta vikten.
             int predclass = 0;
 
             for(int i = 0; i < c; i++)
             {
-                Console.WriteLine("[" + i + "]  " + votes[i].ToString("F4"));
                 if (votes[i] > predictmaxWeight)
                 { 
                     predictmaxWeight = votes[i];
                     predclass = i;
                 }
             }
-            Console.WriteLine("The predicted class is = " + predclass +" with the weight of: " +  predictmaxWeight);
         }
         public double[] MakeWeights(int k, double[] distances)
         {

@@ -8,7 +8,7 @@ public class DataPointSpawner : MonoBehaviour
 {
     public bool shouldUseScatterPlot;
     public bool shouldUseParallelPlot;
-
+    public bool ShouldUseWeights;
     public GameObject DataPointPrefab;
     public GameObject CategoryPrefab;
     public GameObject CategoryMatrixPrefab;
@@ -20,6 +20,8 @@ public class DataPointSpawner : MonoBehaviour
     public List<GameObject> SpawnedDatapoints = new List<GameObject>();
     public List<GameObject> Categories = new List<GameObject>();
     public List<MatrixCategory> MatrixCategories = new List<MatrixCategory>();
+
+    public List<Color> Colors = new List<Color>();
     public Dictionary<string, MatrixCategory> MatrixCategoryMap = new Dictionary<string, MatrixCategory>();
 
     public DataPointInformationHandler DataPointInformationHandler;
@@ -28,9 +30,15 @@ public class DataPointSpawner : MonoBehaviour
     public bool ShouldResetDataPoints { get; set; }
     public static DataPointSpawner Instance;
 
+    public InitializeData DataPlotterHandler;
+
     public bool CategoryExists;
     public int OffsetValueForCategories = 5;
 
+    public bool ShouldUseRegressor;
+
+    public Gradient gradient = new Gradient();
+    public float IncremenetGradientValue;
     public void Start() => Instance = this;
 
   
@@ -39,11 +47,32 @@ public class DataPointSpawner : MonoBehaviour
         if (ShouldResetDataPoints)
         {
             ResetDatapoints();
+            Colors.Clear();
             ShouldResetDataPoints = false;
         }
         while (DataPoints.Count > 0)
         {
             var dp = DataPoints.Dequeue();
+            if (Colors.Count <= 0)
+            {
+                foreach (var feature in KNNController.Instance.Labels)
+                    Colors.Add(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f));
+
+                GradientColorKey[] colorKey = new GradientColorKey[Colors.Count];
+                GradientAlphaKey[] alphaKey = new GradientAlphaKey[Colors.Count];
+
+                float incremenetTime = 1f / Colors.Count;
+                IncremenetGradientValue = incremenetTime;
+                for(int i = 0; i < Colors.Count; i++)
+                {
+                    colorKey[i] = new GradientColorKey(Colors[i], incremenetTime);
+                    alphaKey[i] = new GradientAlphaKey(1f, incremenetTime);
+                    incremenetTime += incremenetTime;
+                }
+                gradient.SetKeys(colorKey, alphaKey);
+
+            }
+
 
             if (shouldUseScatterPlot) { 
                 var prefab = Instantiate(DataPointPrefab).GetComponent<DataPointHandler>();
@@ -121,7 +150,13 @@ public class DataPointSpawner : MonoBehaviour
 
     }
     public void ResetDatapoints() {
+        MatrixCategories.ForEach(x => Destroy(x));
         SpawnedDatapoints.ForEach(data => Destroy(data));
         Categories.ForEach(category => Destroy(category));
+
+
+        //MatrixCategoryMap.Clear(); find a place for this sometime.
+        Categories.Clear();
+        SpawnedDatapoints.Clear();
     }
 }

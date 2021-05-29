@@ -22,13 +22,13 @@ public class MatrixCategory : MonoBehaviour
 
     private void IntercourseWithAnotherCategory(MatrixCategory partner) { 
         DataPointSpawner.Instance.MatrixCategoryMap.Add($"{FeatureID}{partner.FeatureID}", this);
-        KNNController.Instance.StartPrediction(new List<int> { FeatureID, partner.FeatureID }, 1);
+        KNNController.Instance.StartPrediction(new List<int> { FeatureID, partner.FeatureID }, int.Parse(DataPointSpawner.Instance.DataPlotterHandler.KValue.text), DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights);
         IntercourseWithAnotherCategoryButReverseCow(partner);
     }
 
     private void IntercourseWithAnotherCategoryButReverseCow(MatrixCategory partner)
     {
         DataPointSpawner.Instance.MatrixCategoryMap.Add($"{partner.FeatureID}{FeatureID}", partner);
-        KNNController.Instance.StartPrediction(new List<int> {partner.FeatureID, FeatureID }, 1);
+        KNNController.Instance.StartPrediction(new List<int> {partner.FeatureID, FeatureID }, int.Parse(DataPointSpawner.Instance.DataPlotterHandler.KValue.text), DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights);
     }
 }

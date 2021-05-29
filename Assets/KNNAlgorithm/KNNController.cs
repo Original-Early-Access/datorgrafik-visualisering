@@ -25,7 +25,7 @@ namespace Assets.KNNAlgorithm
         public List<string> Labels { get; set; } = new List<string>();
         public List<string> FeatureNames { get; set; } = new List<string>();
         public List<int> AllFeatures { get; set; } = new List<int>();
-        public void StartPrediction(List<int> selectedFeatures, int k)
+        public void StartPrediction(List<int> selectedFeatures, int k, bool shouldUseRegressor, bool shouldUseWeights)
         {
             PrepareData();
             DataPointSpawner.Instance.ShouldResetDataPoints = true;
@@ -37,20 +37,47 @@ namespace Assets.KNNAlgorithm
 
                     for (int i = 0; i < selectedFeatures.Count; i++)
                         values[i] = row.AllValues[selectedFeatures[i]];
-                    RunPrediction(row, selectedFeatures, values, k);
+                    RunPrediction(row, selectedFeatures, values, k, shouldUseRegressor, shouldUseWeights);
                 }
             }
         }
-        public void RunPrediction(DataRow dataRow, List<int> features, double[] values, int k)
+        public void RunPrediction(DataRow dataRow, List<int> features, double[] values, int k, bool shouldUseRegression, bool shouldBeWeighted)
         {
             dataRow.kNNValues = values;
             dataRow.FeatureIDs = features;
-            
-            int predict = kNN.Classify(dataRow, TrainingData, k);
+            double regressValue = 0;
+            if (shouldUseRegression) {
+                if (shouldBeWeighted)
+                    regressValue = kNN.WeightedRegressedClassify(dataRow, TrainingData, k);
+                else regressValue = kNN.Regressor(dataRow, TrainingData, k);
 
-            dataRow.Label = Labels[predict];
-            dataRow.LabelID = predict;
-            
+                if (double.IsNaN(regressValue))
+                    regressValue = 0;
+
+                int roundedValue = (int)Math.Round(regressValue);
+                if (roundedValue > features[features.Count - 1])
+                    roundedValue = features[features.Count - 1];
+
+                if (roundedValue < 0)
+                    roundedValue = 0;
+
+                
+
+                dataRow.RegressionValue = regressValue;
+                dataRow.LabelID = roundedValue;
+                dataRow.Label = Labels[roundedValue];
+            }
+            else
+            {
+                int predict = 0;
+                if (shouldBeWeighted)
+                    predict = kNN.WeightedClassify(dataRow, TrainingData, k);
+                else predict = kNN.Classify(dataRow, TrainingData, k);
+                dataRow.RegressionValue = 0;
+                dataRow.LabelID = predict;
+                dataRow.Label = Labels[predict];
+            }
+
             DataPointSpawner.Instance.DataPoints.Enqueue(dataRow);
         }
 

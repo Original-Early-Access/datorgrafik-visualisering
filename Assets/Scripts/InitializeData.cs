@@ -23,6 +23,7 @@ public class InitializeData : MonoBehaviour
     {
         if (KValue.text != "") // CSV NAME MÅSTE KOLLAS OXÅ SENNARE
         {
+            DataPointSpawner.Instance.ShouldUseRegressor = CSVType.value.Equals(1); // value 1 should be equal to regressor :)
             KNNController.Instance.LoadData(); //, CSVType.value
             StartPlot();
             MainPanel.SetActive(false);
@@ -46,13 +47,15 @@ public class InitializeData : MonoBehaviour
                     Feature_1.dropdown.value,
                     Feature_2.dropdown.value,
                     Feature_3.dropdown.value
-                }, int.Parse(KValue.text))).Start(); 
+                }, int.Parse(KValue.text), DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights)).Start(); 
             }
             else if(PlotMode.value == 1) // should do parallel plot
             {
                 pointSpawner.shouldUseParallelPlot = true;
 
-                new Thread(() => KNNController.Instance.StartPrediction(KNNController.Instance.AllFeatures, int.Parse(KValue.text))).Start();
+                new Thread(() => KNNController.Instance.StartPrediction(KNNController.Instance.AllFeatures,
+                    int.Parse(KValue.text),
+                    DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights)).Start();
             }else if(PlotMode.value == 2) // should do matrix plot
             {
                 DataPointSpawner.Instance.Camera3D.SetActive(false);
