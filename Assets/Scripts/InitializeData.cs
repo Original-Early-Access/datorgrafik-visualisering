@@ -31,30 +31,34 @@ public class InitializeData : MonoBehaviour
     }
     public void StartPlot()
     {
-        if(KValue.text != "")
+        pointSpawner.shouldUseScatterPlot = false;
+        pointSpawner.shouldUseParallelPlot = false;
+        if (KValue.text != "")
         {
             DataPointSpawner.Instance.ResetDatapoints();
             DataPointSpawner.Instance.Camera3D.SetActive(true);
             DataPointSpawner.Instance.Camera2D.SetActive(false);
             DataPointSpawner.Instance.Wall2D.SetActive(false);
-            if (PlotMode.value == 0)
+            if (PlotMode.value == 0) // Should do Scatterplot
             {
                 pointSpawner.shouldUseScatterPlot = true;
-                KNNController.Instance.SelectedFeatures.Clear();
-                KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
-                KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
-                KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
-                new Thread(() => KNNController.Instance.StartPrediction(true, int.Parse(KValue.text), PlotMode.value)).Start(); 
+                new Thread(() => KNNController.Instance.StartPrediction(new List<int>() { 
+                    Feature_1.dropdown.value,
+                    Feature_2.dropdown.value,
+                    Feature_3.dropdown.value
+                }, int.Parse(KValue.text))).Start(); 
             }
-            else if(PlotMode.value == 1)
+            else if(PlotMode.value == 1) // should do parallel plot
             {
-                new Thread(() => KNNController.Instance.StartPrediction(false, int.Parse(KValue.text), PlotMode.value)).Start();
-                pointSpawner.shouldUseScatterPlot = false;
-            }else if(PlotMode.value == 2)
+                pointSpawner.shouldUseParallelPlot = true;
+
+                new Thread(() => KNNController.Instance.StartPrediction(KNNController.Instance.AllFeatures, int.Parse(KValue.text))).Start();
+            }else if(PlotMode.value == 2) // should do matrix plot
             {
                 DataPointSpawner.Instance.Camera3D.SetActive(false);
                 DataPointSpawner.Instance.Camera2D.SetActive(true);
-                DataPointSpawner.Instance.Wall2D.SetActive(true);
+                DataPointSpawner.Instance.Wall2D.SetActive(true);   
+                DataPointSpawner.Instance.InstantiateMatrixCateogires();
             }
         }
     }

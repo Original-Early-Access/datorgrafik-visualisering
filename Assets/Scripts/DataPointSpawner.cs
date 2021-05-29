@@ -7,6 +7,8 @@ using UnityEngine;
 public class DataPointSpawner : MonoBehaviour
 {
     public bool shouldUseScatterPlot;
+    public bool shouldUseParallelPlot;
+
     public GameObject DataPointPrefab;
     public GameObject CategoryPrefab;
     public GameObject CategoryMatrixPrefab;
@@ -18,16 +20,20 @@ public class DataPointSpawner : MonoBehaviour
     public List<GameObject> SpawnedDatapoints = new List<GameObject>();
     public List<GameObject> Categories = new List<GameObject>();
     public List<MatrixCategory> MatrixCategories = new List<MatrixCategory>();
+    public Dictionary<string, MatrixCategory> MatrixCategoryMap = new Dictionary<string, MatrixCategory>();
+
+    public DataPointInformationHandler DataPointInformationHandler;
+
     public Queue<DataRow> DataPoints { get; set; } = new Queue<DataRow>();
     public bool ShouldResetDataPoints { get; set; }
     public static DataPointSpawner Instance;
-    public bool CategoryExists;
 
+    public bool CategoryExists;
     public int OffsetValueForCategories = 5;
-    public float OffsetValueForMatrixCategories = 0.05f;
 
     public void Start() => Instance = this;
 
+  
     private void Update()
     {
         if (ShouldResetDataPoints)
@@ -44,7 +50,7 @@ public class DataPointSpawner : MonoBehaviour
                 SpawnedDatapoints.Add(prefab.gameObject);
                 prefab.SetScatterPlotPrediction(dp);
             }
-            else
+            else if(shouldUseParallelPlot)
             {
                 if (!CategoryExists) { 
                     InstantiateCategories();
@@ -60,15 +66,34 @@ public class DataPointSpawner : MonoBehaviour
                     PrevDataPoint = prefab;
                     count++;
                 }
-
             }
+            else // Matrix plot
+            {
+                var matrix = MatrixCategoryMap[$"{dp.FeatureIDs[0]}{dp.FeatureIDs[1]}"];
+                var partner = MatrixCategoryMap[$"{dp.FeatureIDs[1]}{dp.FeatureIDs[0]}"];
+                Vector3 offset;
+                DataPointHandler prefab = Instantiate(DataPointPrefab).GetComponent<DataPointHandler>();
 
+                if (dp.FeatureIDs[0] < dp.FeatureIDs[1]) // then we go up positive
+                    offset = new Vector3(
+                        partner.transform.position.x - matrix.PositionOffsetForPlot.x + (float)dp.kNNValues[1],
+                        matrix.transform.position.y - matrix.PositionOffsetForPlot.y + (float)dp.kNNValues[0],
+                        matrix.transform.position.z + matrix.PositionOffsetForPlot.z);
+                else
+                    offset = new Vector3(
+                        partner.transform.position.x - matrix.PositionOffsetForPlot.x + (float)dp.kNNValues[1],
+                        matrix.transform.position.y - matrix.PositionOffsetForPlot.y + (float)dp.kNNValues[0],
+                        matrix.transform.position.z + matrix.PositionOffsetForPlot.z);  
+
+                prefab.SetMatrixPLot(dp, offset);
+                SpawnedDatapoints.Add(prefab.gameObject);
+            }
         }
     }
 
     public void InstantiateCategories(){
         Vector3 offset = new Vector3(0, 0, 0);
-        for(int i = 0; i < KNNController.Instance.FeatureNames.Count - 2; i++) // -2 BECAUSE STOOPID ID UNT OTHER THING :)
+        for(int i = 0; i < KNNController.Instance.FeatureNames.Count; i++)
         {
             var prefab = Instantiate(CategoryPrefab, offset, Quaternion.identity);
             Categories.Add(prefab);
@@ -79,14 +104,21 @@ public class DataPointSpawner : MonoBehaviour
     public void InstantiateMatrixCateogires()
     {
         Vector3 offset = new Vector3(0, 0, 0);
-        for (int i = 1; i < KNNController.Instance.FeatureNames.Count - 1; i++) // -2 BECAUSE STOOPID ID UNT OTHER THING :)
+        for (int i = 0; i < KNNController.Instance.FeatureNames.Count; i++) 
         {
             var prefab = Instantiate(CategoryMatrixPrefab, offset, Quaternion.identity).GetComponent<MatrixCategory>();
             prefab.FeatureLabel = KNNController.Instance.FeatureNames[i];
+            prefab.FeatureUIText.text = prefab.FeatureLabel;
             prefab.FeatureID = i;
             MatrixCategories.Add(prefab);
-            offset = new Vector3(offset.x + OffsetValueForMatrixCategories, offset.y + OffsetValueForMatrixCategories, offset.z);
+            offset = new Vector3(offset.x + CategoryMatrixPrefab.transform.lossyScale.x, offset.y - CategoryMatrixPrefab.transform.lossyScale.y, offset.z);
         }
+        foreach(var category in MatrixCategories.ToArray())
+        {
+            category.InitiateIntercourseWithPartners(MatrixCategories);
+            MatrixCategories.RemoveAt(0);
+        }
+
     }
     public void ResetDatapoints() {
         SpawnedDatapoints.ForEach(data => Destroy(data));

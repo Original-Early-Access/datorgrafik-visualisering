@@ -24,36 +24,27 @@ namespace Assets.KNNAlgorithm
         public List<string[]> data { get; set; } = new List<string[]>();
         public List<string> Labels { get; set; } = new List<string>();
         public List<string> FeatureNames { get; set; } = new List<string>();
-        public List<int> SelectedFeatures { get; set; } = new List<int>();
-        public void StartPrediction(bool shouldUseScatterPlot, int k, int PlotID)
+        public List<int> AllFeatures { get; set; } = new List<int>();
+        public void StartPrediction(List<int> selectedFeatures, int k)
         {
             PrepareData();
             DataPointSpawner.Instance.ShouldResetDataPoints = true;
-            if (shouldUseScatterPlot) { 
-                foreach (var row in UnkownData.DataRows)
-                {
-                    if (row != null) {
-                        RunPrediction(row, new double[] {
-                                (float)row.AllValues[SelectedFeatures[0] - 1],
-                                (float)row.AllValues[SelectedFeatures[1] - 1],
-                                (float)row.AllValues[SelectedFeatures[2] - 1] },
-                            k,
-                            shouldUseScatterPlot);
-                    }
+
+            foreach (var row in UnkownData.DataRows)
+            {
+                if (row != null) {
+                    double[] values = new double[selectedFeatures.Count];
+
+                    for (int i = 0; i < selectedFeatures.Count; i++)
+                        values[i] = row.AllValues[selectedFeatures[i]];
+                    RunPrediction(row, selectedFeatures, values, k);
                 }
             }
-            else
-            {
-                SelectedFeatures.Clear();
-                for (int i = 1; i < FeatureNames.Count - 1; i++)
-                    SelectedFeatures.Add(i);
-                UnkownData.DataRows.ForEach(d => RunPrediction(d, d.AllValues.Select(val => (double)val).ToArray(), k, shouldUseScatterPlot));
-            }
-        }   
-        public void RunPrediction(DataRow dataRow, double[] values, int k, bool shouldUseDatapoint)
+        }
+        public void RunPrediction(DataRow dataRow, List<int> features, double[] values, int k)
         {
             dataRow.kNNValues = values;
-            dataRow.FeatureIDs = SelectedFeatures;
+            dataRow.FeatureIDs = features;
             
             int predict = kNN.Classify(dataRow, TrainingData, k);
 
@@ -63,23 +54,16 @@ namespace Assets.KNNAlgorithm
             DataPointSpawner.Instance.DataPoints.Enqueue(dataRow);
         }
 
-        /*
-        public void RunPrediction(DataRow dataRow, int k, bool shouldUseDatapoint)
-        {
-            int predict = 0;
-            if (shouldUseDatapoint)
-                predict = kNN.Classify(new double[] { dataRow.DataPoint.X, dataRow.DataPoint.Y, dataRow.DataPoint.Z }, TrainingData, k);
-            else predict = kNN.Classify(dataRow.Values.Select(val => (double)val).ToArray(), TrainingData, k);
-
-            dataRow.Label = Labels[predict];
-            dataRow.LabelID = predict;
-            DataPointSpawner.Instance.DataPoints.Enqueue(dataRow);
-        }*/
-
         public void LoadData(string csv = "Iris.csv")
         {
+            FeatureNames.Clear();
+            AllFeatures.Clear();
             data = LoadCSV(csv);
             FeatureNames = data[0].ToList();
+            FeatureNames.Remove(FeatureNames[FeatureNames.Count - 1]);// target feature
+            for (int i = 0; i < FeatureNames.Count; i++)
+                AllFeatures.Add(i);
+
             data.RemoveAt(0);
         }
 
@@ -111,7 +95,7 @@ namespace Assets.KNNAlgorithm
 
                 newData.DataRows.Add(new DataRow()
                 {
-                    AllValues = data[i].Skip(1).Take(data[i].Length-2).Select(value => double.Parse(value, CultureInfo.InvariantCulture)).ToList(),
+                    AllValues = data[i].Take(data[i].Length-1).Select(value => double.Parse(value, CultureInfo.InvariantCulture)).ToList(),
                     LabelID = Labels.IndexOf(data[i][labelPos])
                 });
 

@@ -56,7 +56,7 @@ namespace KnnConsoleAppForUnity
             double sum = 0.0;
 
             for(int i = 0; i < dataRow.FeatureIDs.Count; i++)
-                sum += Math.Pow(dataRow.kNNValues[i] - data[dataRow.FeatureIDs[i] - 1], 2);
+                sum += Math.Pow(dataRow.kNNValues[i] - data[dataRow.FeatureIDs[i]], 2);
 
             return Math.Sqrt(sum);
         }

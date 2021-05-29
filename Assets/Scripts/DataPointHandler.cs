@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class DataPointHandler : MonoBehaviour
 {
+    public float FeatureValue0;
+    public float FeatureValue1; 
     public DataRow DataRow;
     public DataPointHandler PreviousDataPoint;
     public LineRenderer lineRenderer;
@@ -45,7 +47,7 @@ public class DataPointHandler : MonoBehaviour
         Z = (float)dataRow.kNNValues[2];
         endMarker = new Vector3(X, Y, Z);
         ShouldInterpolate = true;
-
+        DataRow = dataRow;
         startTime = Time.time;
 
         if (dataRow.LabelID == 0)
@@ -67,12 +69,12 @@ public class DataPointHandler : MonoBehaviour
 
     public void SetParallelPlot(DataRow dataRow, Vector3 pos, DataPointHandler prevDataPoint, int count)
     {
+        lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.enabled = true;
         endMarker = new Vector3(pos.x, (float)dataRow.AllValues[count] * 2, pos.z);
         PreviousDataPoint = prevDataPoint;
         DataRow = dataRow;
-        // add some logic for drawing big line to prevdatapoint;
-        // be careful with adding lines if thingy hasn't moved yet :)
-
+        
         ShouldInterpolate = true;
 
         startTime = Time.time;
@@ -93,8 +95,27 @@ public class DataPointHandler : MonoBehaviour
 
     public void SetMatrixPLot(DataRow dataRow, Vector3 pos)
     {
+        FeatureValue0 = (float)dataRow.kNNValues[0];
+        FeatureValue1 = (float)dataRow.kNNValues[1];
 
-    }
+        DataRow = dataRow;
+        startMarker = transform.position;
+        endMarker = pos;
+        startTime = Time.time;
+        ShouldInterpolate = true;
+        journeyLength = Vector3.Distance(startMarker, endMarker);
+
+        if (dataRow.LabelID == 0)
+            Color = Color.green;
+        else if (dataRow.LabelID == 1)
+            Color = Color.blue;
+        else
+            Color = Color.red;
+
+        if (MeshRenderer == null)
+            MeshRenderer = GetComponent<MeshRenderer>();
+        MeshRenderer.material.color = Color;
+    }   
     void Update()
     {
         if (ShouldInterpolate && !journeyEnded) { 
@@ -123,5 +144,9 @@ public class DataPointHandler : MonoBehaviour
             lineRenderer.material.color = Color;
             lineRenderer.SetPositions(new Vector3[] { transform.position, PreviousDataPoint.transform.position });
         }
+    }
+    private void OnMouseDown()
+    {
+        DataPointSpawner.Instance.DataPointInformationHandler.InstantiatePanels(DataRow);
     }
 }

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2955916857028844006}
   - component: {fileID: 625726749720974855}
   - component: {fileID: 7395329003161472400}
+  - component: {fileID: -7878246162827143796}
   m_Layer: 0
   m_Name: MatrixCategory
   m_TagString: Untagged
@@ -27,8 +28,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 778582726677908843}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.9, y: 10.9, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 8, y: 8, z: 1}
   m_Children:
   - {fileID: 629639518894020740}
   m_Father: {fileID: 0}
@@ -97,6 +98,22 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-7878246162827143796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 778582726677908843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e94958f73d4ceed4cb155121fd339846, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FeatureID: 0
+  FeatureLabel: 
+  FeatureUIText: {fileID: 5176340752279701737}
+  PositionOffsetForPlot: {x: 4, y: 4, z: -0.5}
 --- !u!1 &1906587294688656609
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,7 +192,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: SEPAL LENGTH
+  m_Text: '
+
+'
 --- !u!1 &2770714484876284099
 GameObject:
   m_ObjectHideFlags: 0
