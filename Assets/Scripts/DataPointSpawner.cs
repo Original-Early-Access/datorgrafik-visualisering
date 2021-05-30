@@ -18,7 +18,7 @@ public class DataPointSpawner : MonoBehaviour
     public GameObject Wall2D;
 
     public List<GameObject> SpawnedDatapoints = new List<GameObject>();
-    public List<GameObject> Categories = new List<GameObject>();
+    public List<CategoryHandler> Categories = new List<CategoryHandler>();
     public List<MatrixCategory> MatrixCategories = new List<MatrixCategory>();
 
     public List<Color> Colors = new List<Color>();
@@ -124,7 +124,8 @@ public class DataPointSpawner : MonoBehaviour
         Vector3 offset = new Vector3(0, 0, 0);
         for(int i = 0; i < KNNController.Instance.FeatureNames.Count; i++)
         {
-            var prefab = Instantiate(CategoryPrefab, offset, Quaternion.identity);
+            var prefab = Instantiate(CategoryPrefab, offset, Quaternion.identity).GetComponent<CategoryHandler>();
+            prefab.LabelText.text = KNNController.Instance.FeatureNames[i];
             Categories.Add(prefab);
             offset = new Vector3(offset.x + OffsetValueForCategories, offset.y, offset.z);
         }
@@ -142,6 +143,7 @@ public class DataPointSpawner : MonoBehaviour
             MatrixCategories.Add(prefab);
             offset = new Vector3(offset.x + CategoryMatrixPrefab.transform.lossyScale.x, offset.y - CategoryMatrixPrefab.transform.lossyScale.y, offset.z);
         }
+
         foreach(var category in MatrixCategories.ToArray())
         {
             category.InitiateIntercourseWithPartners(MatrixCategories);

@@ -25,11 +25,11 @@ namespace Assets.KNNAlgorithm
         public List<string> Labels { get; set; } = new List<string>();
         public List<string> FeatureNames { get; set; } = new List<string>();
         public List<int> AllFeatures { get; set; } = new List<int>();
+        public List<int> SelectedFeatures { get; set; } = new List<int>();
         public void StartPrediction(List<int> selectedFeatures, int k, bool shouldUseRegressor, bool shouldUseWeights)
         {
             PrepareData();
             DataPointSpawner.Instance.ShouldResetDataPoints = true;
-
             foreach (var row in UnkownData.DataRows)
             {
                 if (row != null) {
@@ -41,7 +41,7 @@ namespace Assets.KNNAlgorithm
                 }
             }
         }
-        public void RunPrediction(DataRow dataRow, List<int> features, double[] values, int k, bool shouldUseRegression, bool shouldBeWeighted)
+        public int RunPrediction(DataRow dataRow, List<int> features, double[] values, int k, bool shouldUseRegression, bool shouldBeWeighted)
         {
             dataRow.kNNValues = values;
             dataRow.FeatureIDs = features;
@@ -79,14 +79,15 @@ namespace Assets.KNNAlgorithm
             }
 
             DataPointSpawner.Instance.DataPoints.Enqueue(dataRow);
+            return dataRow.LabelID;
         }
 
-        public void LoadData(string csv = "Iris.csv")
+        public void LoadData(string csv)
         {
             FeatureNames.Clear();
             AllFeatures.Clear();
             data = LoadCSV(csv);
-            FeatureNames = data[0].ToList();
+            FeatureNames = data[0].ToList();    
             FeatureNames.Remove(FeatureNames[FeatureNames.Count - 1]);// target feature
             for (int i = 0; i < FeatureNames.Count; i++)
                 AllFeatures.Add(i);

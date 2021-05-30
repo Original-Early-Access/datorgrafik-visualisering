@@ -7,6 +7,7 @@ public class NavbarHandler : MonoBehaviour
     public GameObject InRuntimeNavbarPanel;
     public GameObject ChangePlotModePanel;
     public GameObject AddDatapointPanel;
+    public DataPointInformationHandler AddDatapointInformationHandler;
     public void ToggleInRuntimeNavbar()
     {
         if (InRuntimeNavbarPanel != null)
@@ -21,7 +22,9 @@ public class NavbarHandler : MonoBehaviour
 
     public void ToggleAddDatapoint()
     {
-        if (AddDatapointPanel != null)
+        if (AddDatapointPanel != null) { 
             AddDatapointPanel.SetActive(!AddDatapointPanel.activeSelf);
+            AddDatapointInformationHandler.InstantiatePanels();
+        }
     }
 }

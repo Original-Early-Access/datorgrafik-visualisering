@@ -10,14 +10,13 @@ public class DropDownHandler : MonoBehaviour
     void Start()
     {
         dropdown = GetComponent<Dropdown>();
-        PopulateDropdown();
     }
 
-    void PopulateDropdown()
+    public void PopulateDropdown()
     {
         dropdown.ClearOptions();
         if (KNNController.Instance.FeatureNames.Count == 0)
-            KNNController.Instance.LoadData();
+            KNNController.Instance.LoadData(DataPointSpawner.Instance.DataPlotterHandler.CSVPath.text);
         dropdown.AddOptions(KNNController.Instance.FeatureNames);
     }
 }

@@ -14,6 +14,9 @@ public class DataPointHandler : MonoBehaviour
     public Color Color;
     public float speed = 1.0F;
 
+    public AudioSource SpawnSound;
+    public AudioSource DatapointOnClickSound;
+
     // Time when the movement started.
     private float startTime;
 
@@ -83,7 +86,7 @@ public class DataPointHandler : MonoBehaviour
     {
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.enabled = true;
-        endMarker = new Vector3(pos.x, (float)dataRow.AllValues[count] * 2, pos.z);
+        endMarker = new Vector3(pos.x, (float)dataRow.kNNValues[count] * 2, pos.z);
         PreviousDataPoint = prevDataPoint;
         DataRow = dataRow;
         RegressionValue = dataRow.RegressionValue;
@@ -161,6 +164,7 @@ public class DataPointHandler : MonoBehaviour
             
             if(Vector3.Distance(transform.position, endMarker) <= 0) { 
                 journeyEnded = true;
+                SpawnSound.Play();
                 CreateLine();
             }
         }
@@ -178,6 +182,7 @@ public class DataPointHandler : MonoBehaviour
     }
     private void OnMouseDown()
     {
+        DatapointOnClickSound.Play();
         DataPointSpawner.Instance.DataPointInformationHandler.InstantiatePanels(DataRow);
     }
 }

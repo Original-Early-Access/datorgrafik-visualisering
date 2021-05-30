@@ -19,21 +19,32 @@ public class InitializeData : MonoBehaviour
     public DropDownHandler Feature_2;
     public DropDownHandler Feature_3;
 
+    public bool CSVHasBeenLoaded;
     public void OnLoadClick()
     {
-        if (KValue.text != "") // CSV NAME MÅSTE KOLLAS OXÅ SENNARE
+        if (KValue.text != "" && CSVHasBeenLoaded) // CSV NAME MÅSTE KOLLAS OXÅ SENNARE
         {
             DataPointSpawner.Instance.ShouldUseRegressor = CSVType.value.Equals(1); // value 1 should be equal to regressor :)
-            KNNController.Instance.LoadData(); //, CSVType.value
+            KNNController.Instance.LoadData(@CSVPath.text); 
             StartPlot();
             MainPanel.SetActive(false);
+            
             navbarToggle.ToggleInRuntimeNavbar();
         }
+    }
+
+    public void LoadCSV()
+    {
+        Feature_1.PopulateDropdown();
+        Feature_2.PopulateDropdown();
+        Feature_3.PopulateDropdown();
+        CSVHasBeenLoaded = true;
     }
     public void StartPlot()
     {
         pointSpawner.shouldUseScatterPlot = false;
         pointSpawner.shouldUseParallelPlot = false;
+        KNNController.Instance.SelectedFeatures.Clear();
         if (KValue.text != "")
         {
             DataPointSpawner.Instance.ResetDatapoints();
@@ -42,6 +53,10 @@ public class InitializeData : MonoBehaviour
             DataPointSpawner.Instance.Wall2D.SetActive(false);
             if (PlotMode.value == 0) // Should do Scatterplot
             {
+                KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
+                KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
+                KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
+
                 pointSpawner.shouldUseScatterPlot = true;
                 new Thread(() => KNNController.Instance.StartPrediction(new List<int>() { 
                     Feature_1.dropdown.value,
@@ -52,12 +67,14 @@ public class InitializeData : MonoBehaviour
             else if(PlotMode.value == 1) // should do parallel plot
             {
                 pointSpawner.shouldUseParallelPlot = true;
-
+                KNNController.Instance.SelectedFeatures = KNNController.Instance.AllFeatures;
                 new Thread(() => KNNController.Instance.StartPrediction(KNNController.Instance.AllFeatures,
                     int.Parse(KValue.text),
                     DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights)).Start();
             }else if(PlotMode.value == 2) // should do matrix plot
             {
+                KNNController.Instance.SelectedFeatures = KNNController.Instance.AllFeatures;
+
                 DataPointSpawner.Instance.Camera3D.SetActive(false);
                 DataPointSpawner.Instance.Camera2D.SetActive(true);
                 DataPointSpawner.Instance.Wall2D.SetActive(true);   
