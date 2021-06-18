@@ -1,6 +1,7 @@
 using Assets.KNNAlgorithm;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,49 +45,59 @@ public class InitializeData : MonoBehaviour
     {
         pointSpawner.shouldUseScatterPlot = false;
         pointSpawner.shouldUseParallelPlot = false;
+
         KNNController.Instance.SelectedFeatures.Clear();
-        if (KValue.text != "")
+        DataPointSpawner.Instance.ResetDatapoints();
+
+        DataPointSpawner.Instance.MatrixCategories.ForEach(category => Destroy(category.gameObject));
+        DataPointSpawner.Instance.MatrixCategories.Clear();
+        DataPointSpawner.Instance.MatrixCategoryMap.Clear();
+
+        DataPointSpawner.Instance.Categories.ForEach(category => Destroy(category.gameObject));
+        DataPointSpawner.Instance.Categories.Clear();
+        DataPointSpawner.Instance.CategoryExists = false;
+
+        DataPointSpawner.Instance.Camera3D.SetActive(true);
+        DataPointSpawner.Instance.Camera2D.SetActive(false);
+        DataPointSpawner.Instance.Wall2D.SetActive(false);
+            
+            
+        if (PlotMode.value == 0) // Should do Scatterplot
         {
-            DataPointSpawner.Instance.ResetDatapoints();
-            DataPointSpawner.Instance.Camera3D.SetActive(true);
-            DataPointSpawner.Instance.Camera2D.SetActive(false);
-            DataPointSpawner.Instance.Wall2D.SetActive(false);
-            if (PlotMode.value == 0) // Should do Scatterplot
-            {
-                KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
-                KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
-                KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
+            KNNController.Instance.SelectedFeatures.Add(Feature_1.dropdown.value);
+            KNNController.Instance.SelectedFeatures.Add(Feature_2.dropdown.value);
+            KNNController.Instance.SelectedFeatures.Add(Feature_3.dropdown.value);
 
-                pointSpawner.shouldUseScatterPlot = true;
-                new Thread(() => KNNController.Instance.StartPrediction(new List<int>() { 
-                    Feature_1.dropdown.value,
-                    Feature_2.dropdown.value,
-                    Feature_3.dropdown.value
-                }, int.Parse(KValue.text), DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights)).Start(); 
-            }
-            else if(PlotMode.value == 1) // should do parallel plot
-            {
-                pointSpawner.shouldUseParallelPlot = true;
-                KNNController.Instance.SelectedFeatures = KNNController.Instance.AllFeatures;
-                new Thread(() => KNNController.Instance.StartPrediction(KNNController.Instance.AllFeatures,
-                    int.Parse(KValue.text),
-                    DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights)).Start();
-            }else if(PlotMode.value == 2) // should do matrix plot
-            {
-                KNNController.Instance.SelectedFeatures = KNNController.Instance.AllFeatures;
-
-                DataPointSpawner.Instance.Camera3D.SetActive(false);
-                DataPointSpawner.Instance.Camera2D.SetActive(true);
-                DataPointSpawner.Instance.Wall2D.SetActive(true);   
-                DataPointSpawner.Instance.InstantiateMatrixCateogires();
-            }
+            pointSpawner.shouldUseScatterPlot = true;
+            new Thread(() => KNNController.Instance.StartPrediction(new List<int>() { 
+                Feature_1.dropdown.value,
+                Feature_2.dropdown.value,
+                Feature_3.dropdown.value
+            }, int.Parse(KValue.text), DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights)).Start(); 
         }
+        else if(PlotMode.value == 1) // should do parallel plot
+        {
+            pointSpawner.shouldUseParallelPlot = true;
+            KNNController.Instance.SelectedFeatures = KNNController.Instance.AllFeatures.ToList();
+            new Thread(() => KNNController.Instance.StartPrediction(KNNController.Instance.AllFeatures,
+                int.Parse(KValue.text),
+                DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights)).Start();
+        }
+        else if(PlotMode.value == 2) // should do matrix plot
+        {
+            KNNController.Instance.SelectedFeatures = KNNController.Instance.AllFeatures.ToList();
+
+            DataPointSpawner.Instance.Camera3D.SetActive(false);
+            DataPointSpawner.Instance.Camera2D.SetActive(true);
+            DataPointSpawner.Instance.Wall2D.SetActive(true);   
+            DataPointSpawner.Instance.InstantiateMatrixCateogires();
+        }
+        
     }
 
     public void ChangePlot()
     {
         StartPlot();
-        navbarToggle.ToggleChangePlotMode();
     }
 
 }

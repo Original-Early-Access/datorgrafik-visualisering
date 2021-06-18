@@ -12,6 +12,7 @@ public class MatrixCategory : MonoBehaviour
     public string FeatureLabel;
     public Text FeatureUIText;
     public GameObject UnderBox;
+
     public Vector3 PositionOffsetForPlot;
 
     public void InitiateIntercourseWithPartners(List<MatrixCategory> partners) 

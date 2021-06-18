@@ -21,6 +21,8 @@ namespace Assets.KNNAlgorithm
 
         public DataSet TrainingData { get; set; }
         public DataSet UnkownData { get; set; }
+
+        public DataSet ActiveData { get; set; }
         public List<string[]> data { get; set; } = new List<string[]>();
         public List<string> Labels { get; set; } = new List<string>();
         public List<string> FeatureNames { get; set; } = new List<string>();
@@ -37,19 +39,27 @@ namespace Assets.KNNAlgorithm
 
                     for (int i = 0; i < selectedFeatures.Count; i++)
                         values[i] = row.AllValues[selectedFeatures[i]];
-                    RunPrediction(row, selectedFeatures, values, k, shouldUseRegressor, shouldUseWeights);
+                    RunPrediction(row, selectedFeatures, values, k, shouldUseRegressor, shouldUseWeights, false);
                 }
             }
         }
-        public int RunPrediction(DataRow dataRow, List<int> features, double[] values, int k, bool shouldUseRegression, bool shouldBeWeighted)
+
+        public int RunPrediction(DataRow dataRow, List<int> features, double[] values, int k, bool shouldUseRegression, bool shouldBeWeighted, bool ShouldUseActiveData)
         {
+
+            DataSet dataSet;
+            dataRow.ShouldUseNeighbour = ShouldUseActiveData;
+            if (ShouldUseActiveData)
+                dataSet = ActiveData;
+            else dataSet = TrainingData;
+
             dataRow.kNNValues = values;
             dataRow.FeatureIDs = features;
             double regressValue = 0;
             if (shouldUseRegression) {
                 if (shouldBeWeighted)
-                    regressValue = kNN.WeightedRegressedClassify(dataRow, TrainingData, k);
-                else regressValue = kNN.Regressor(dataRow, TrainingData, k);
+                    regressValue = kNN.WeightedRegressedClassify(dataRow, dataSet, k);
+                else regressValue = kNN.Regressor(dataRow, dataSet, k);
 
                 if (double.IsNaN(regressValue))
                     regressValue = 0;
@@ -71,22 +81,28 @@ namespace Assets.KNNAlgorithm
             {
                 int predict = 0;
                 if (shouldBeWeighted)
-                    predict = kNN.WeightedClassify(dataRow, TrainingData, k);
-                else predict = kNN.Classify(dataRow, TrainingData, k);
+                    predict = kNN.WeightedClassify(dataRow, dataSet, k);
+                else predict = kNN.Classify(dataRow, dataSet, k);
                 dataRow.RegressionValue = 0;
                 dataRow.LabelID = predict;
                 dataRow.Label = Labels[predict];
             }
-
-            DataPointSpawner.Instance.DataPoints.Enqueue(dataRow);
-            return dataRow.LabelID;
+            ActiveData.DataRows.Add(dataRow); // needs to be emptied sometime
+            return dataRow.LabelID; 
         }
 
+        public void PlotData()
+        {
+            DataPointSpawner.Instance.FillBiggestValues();
+            foreach(var item in ActiveData.DataRows)
+                DataPointSpawner.Instance.DataPoints.Enqueue(item);
+        }
         public void LoadData(string csv)
         {
             FeatureNames.Clear();
             AllFeatures.Clear();
             data = LoadCSV(csv);
+            ActiveData = new DataSet();
             FeatureNames = data[0].ToList();    
             FeatureNames.Remove(FeatureNames[FeatureNames.Count - 1]);// target feature
             for (int i = 0; i < FeatureNames.Count; i++)
@@ -109,6 +125,7 @@ namespace Assets.KNNAlgorithm
             UnkownData = FillData(data);
             TrainingData.Labels = Labels;
             UnkownData.Labels = Labels;
+            ActiveData.Labels = Labels;
         }
 
         private DataSet FillData(List<string[]> data)

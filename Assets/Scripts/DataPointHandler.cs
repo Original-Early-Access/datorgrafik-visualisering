@@ -1,6 +1,7 @@
 using Assets.KNNAlgorithm;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DataPointHandler : MonoBehaviour
@@ -13,7 +14,7 @@ public class DataPointHandler : MonoBehaviour
     public MeshRenderer MeshRenderer;
     public Color Color;
     public float speed = 1.0F;
-
+    public float SecondsToBlink;
     public AudioSource SpawnSound;
     public AudioSource DatapointOnClickSound;
 
@@ -38,7 +39,11 @@ public class DataPointHandler : MonoBehaviour
     public Vector3 endMarker;
 
     public bool journeyEnded;
-
+    public bool ShouldBlink;
+    public float BlinkCooldown;
+    private float currentCooldown;
+    public List<Color> BlinkColors;
+    public int BlinkIndex;
     private void Start()
     {
         lineRenderer = GetComponent<LineRenderer>();
@@ -124,6 +129,8 @@ public class DataPointHandler : MonoBehaviour
 
         DataRow = dataRow;
         startMarker = transform.position;
+
+
         endMarker = pos;
         startTime = Time.time;
         ShouldInterpolate = true;
@@ -131,14 +138,10 @@ public class DataPointHandler : MonoBehaviour
 
         if (DataPointSpawner.Instance.ShouldUseRegressor)
         {
-            float diff = (float)(dataRow.LabelID - dataRow.RegressionValue);
-            float eval = DataPointSpawner.Instance.IncremenetGradientValue * dataRow.LabelID;
-            eval += diff;
-            if (eval > 1)
-                eval = 1;
-            if (eval < 0)
-                eval = 0;
-            Color = DataPointSpawner.Instance.gradient.Evaluate(eval);
+            Color = DataPointSpawner.Instance.gradient.Evaluate((float)(
+                (dataRow.kNNValues[0] + dataRow.kNNValues[1]) / 2) 
+                /
+                (DataPointSpawner.Instance.BiggestValuePairX[dataRow.FeatureIDs[0]] + DataPointSpawner.Instance.BiggestValuePairY[dataRow.FeatureIDs[1]]) / 2 );
         }
         else
         {
@@ -164,12 +167,46 @@ public class DataPointHandler : MonoBehaviour
             
             if(Vector3.Distance(transform.position, endMarker) <= 0) { 
                 journeyEnded = true;
-                SpawnSound.Play();
+                HighlightNeighbours();
+                //SpawnSound.Play();
                 CreateLine();
+            }
+        }
+
+        if (ShouldBlink)
+        {
+            currentCooldown -= Time.deltaTime;
+            if (currentCooldown <= 0)
+            {
+                MeshRenderer.material.color = BlinkColors[BlinkIndex];
+                if (BlinkIndex == 1)
+                    BlinkIndex = 0;
+                else BlinkIndex = 1;
+                currentCooldown = BlinkCooldown;
             }
         }
     }
 
+    public void HighlightNeighbours()
+    {
+        if (DataRow.ShouldUseNeighbour)
+            foreach (var neighbour in DataPointSpawner.Instance.SpawnedDatapoints.Where(x => DataRow.Neighbours.Contains(x.GetComponent<DataPointHandler>().DataRow)))
+                neighbour.GetComponent<DataPointHandler>().Blink();
+    }
+
+    public void Blink()
+    {
+        StartCoroutine(BlinkTimer(SecondsToBlink)); 
+    }
+
+    public IEnumerator BlinkTimer(float secondsToBlink)
+    {
+        ShouldBlink = true;
+        yield return new WaitForSeconds(secondsToBlink);
+        ShouldBlink = false;
+        MeshRenderer.material.color = Color;
+
+    }
     public void CreateLine()
     {
         if (!(PreviousDataPoint is null))
@@ -184,5 +221,6 @@ public class DataPointHandler : MonoBehaviour
     {
         DatapointOnClickSound.Play();
         DataPointSpawner.Instance.DataPointInformationHandler.InstantiatePanels(DataRow);
+        HighlightNeighbours();
     }
 }

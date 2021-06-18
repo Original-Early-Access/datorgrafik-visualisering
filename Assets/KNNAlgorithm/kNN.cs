@@ -22,8 +22,8 @@ namespace KnnConsoleAppForUnity
                 info[i] = curr;
             }
             
-            Array.Sort(info); //sortera distans
-            return Vote(info, trainData, k);
+            Array.Sort(info); 
+            return Vote(info, dataRow, trainData, k);
         }
 
         public static double Regressor(DataRow dataRow, DataSet trainData, int k)
@@ -41,9 +41,9 @@ namespace KnnConsoleAppForUnity
             }
 
             Array.Sort(info); //sortera distans
-            return Regress(info, trainData, k);
+            return Regress(info, dataRow, trainData, k);
         }
-        static int Vote(IndexAndDistance[] info, DataSet trainData, int k)
+        static int Vote(IndexAndDistance[] info,DataRow dataRow, DataSet trainData, int k)
         {
             int[] votes = new int[trainData.Labels.Count]; // tar inte hand om dubbel data. Ta bort dubbeldata!
 
@@ -51,6 +51,7 @@ namespace KnnConsoleAppForUnity
             {
                 int idx = info[i].idx;
                 int c = trainData.DataRows.ToArray()[idx].LabelID;
+                dataRow.Neighbours.Add(trainData.DataRows[idx]);
                 votes[c]++;
             }
 
@@ -68,7 +69,7 @@ namespace KnnConsoleAppForUnity
             return classWithMostVotes; //returnerar den klassen som har fått mest röster dvs den som är mest runt om unknown
         } 
 
-        static double Regress(IndexAndDistance[] info, DataSet trainData, int k)
+        static double Regress(IndexAndDistance[] info, DataRow dataRow, DataSet trainData, int k)
         {
             double sum = 0;
 
@@ -76,6 +77,8 @@ namespace KnnConsoleAppForUnity
             {
                 int idx = info[i].idx;
                 sum += trainData.DataRows.ToArray()[idx].LabelID;
+                dataRow.Neighbours.Add(trainData.DataRows[idx]);
+
             }
             if (sum == 0 || k == 0)
                 return 0;
@@ -111,7 +114,7 @@ namespace KnnConsoleAppForUnity
             Array.Sort(info); //sortera distans
             double[] weights = MakeWeights(k, info);
 
-            return WeightedVote(info, trainData, weights, k);
+            return WeightedVote(info, dataRow, trainData, weights, k);
         }
         public static double WeightedRegressedClassify(DataRow dataRow, DataSet trainData, int k)
         {
@@ -130,10 +133,10 @@ namespace KnnConsoleAppForUnity
             Array.Sort(info); //sortera distans
             double[] weights = MakeWeights(k, info);
 
-            return WeightedRegressedVote(info, trainData, weights, k);
+            return WeightedRegressedVote(info, dataRow, trainData, weights, k);
         }
 
-        static int WeightedVote(IndexAndDistance[] info, DataSet trainData,double[] weights,  int k)
+        static int WeightedVote(IndexAndDistance[] info, DataRow dataRow, DataSet trainData,double[] weights,  int k)
         {
             double[] votes = new double[trainData.Labels.Count]; // en per lable/class
 
@@ -142,6 +145,7 @@ namespace KnnConsoleAppForUnity
                 int idx = info[i].idx;
                 int predClass = trainData.DataRows.ToArray()[idx].LabelID;
                 votes[predClass] += weights[i] * 1.0;
+                dataRow.Neighbours.Add(trainData.DataRows[idx]);
             }
             double predictmaxWeight = 0.0; //hitta störta vikten.
             int predclass = 0;
@@ -157,13 +161,15 @@ namespace KnnConsoleAppForUnity
             }
             return predclass;
         }
-        static double WeightedRegressedVote(IndexAndDistance[] info, DataSet trainData, double[] weights, int k)
+        static double WeightedRegressedVote(IndexAndDistance[] info, DataRow dataRow, DataSet trainData, double[] weights, int k)
         {
             double sum = 0;
             for (int i = 0; i < k; i++)
             {
                 int idx = info[i].idx;
                 sum += trainData.DataRows.ToArray()[idx].LabelID + weights[i];
+                dataRow.Neighbours.Add(trainData.DataRows[idx]);
+
             }
             if (sum == 0 || k == 0)
                 return 0;

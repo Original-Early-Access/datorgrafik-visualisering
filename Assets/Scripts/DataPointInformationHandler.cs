@@ -1,6 +1,7 @@
 using Assets.KNNAlgorithm;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
@@ -56,7 +57,7 @@ public class DataPointInformationHandler : MonoBehaviour
     public void SpawnDataPoint()
     {
         if (DataPointSpawner.Instance.DataPlotterHandler.PlotMode.value == 2)
-        { //SHOULD USE MATRIX PLOTT!!! NEED TO BE CHANGED
+        {
 
             foreach (var matrix in DataPointSpawner.Instance.MatrixCategoryMap)
             {
@@ -65,8 +66,9 @@ public class DataPointInformationHandler : MonoBehaviour
 
                 dataRow.kNNValues[0] = double.Parse(ExistingPanels[0].FeatureInputField.text);
                 dataRow.kNNValues[1] = double.Parse(ExistingPanels[1].FeatureInputField.text);
+                dataRow.AllValues = dataRow.kNNValues.ToList();
                 dataRow.FeatureIDs = new List<int> { int.Parse(matrix.Key[0].ToString()), int.Parse(matrix.Key[1].ToString())};
-                KNNController.Instance.RunPrediction(dataRow, dataRow.FeatureIDs, dataRow.kNNValues, int.Parse(DataPointSpawner.Instance.DataPlotterHandler.KValue.text), DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights);
+                KNNController.Instance.RunPrediction(dataRow, dataRow.FeatureIDs, dataRow.kNNValues, int.Parse(DataPointSpawner.Instance.DataPlotterHandler.KValue.text), DataPointSpawner.Instance.ShouldUseRegressor, DataPointSpawner.Instance.ShouldUseWeights, true);
             }
         }
         else
@@ -74,19 +76,19 @@ public class DataPointInformationHandler : MonoBehaviour
             DataRow dataRow = new DataRow();
             dataRow.kNNValues = new double[2];
             dataRow.kNNValues = new double[ExistingPanels.Count];
-
             for (int i = 0; i < ExistingPanels.Count; i++)
             {
                 dataRow.kNNValues[i] = double.Parse(ExistingPanels[i].FeatureInputField.text);
                 dataRow.FeatureIDs.Add(DataPointSpawner.Instance.SpawnedDatapoints[0].GetComponent<DataPointHandler>().DataRow.FeatureIDs[i]);
             }
+            dataRow.AllValues = dataRow.kNNValues.ToList();
             LabelText.text = KNNController.Instance.Labels[KNNController.Instance.RunPrediction(
                 dataRow, 
                 dataRow.FeatureIDs,
                 dataRow.kNNValues,
                 int.Parse(DataPointSpawner.Instance.DataPlotterHandler.KValue.text),
                 DataPointSpawner.Instance.ShouldUseRegressor,
-                DataPointSpawner.Instance.ShouldUseWeights)];
+                DataPointSpawner.Instance.ShouldUseWeights, true)];
         }
 
     }
